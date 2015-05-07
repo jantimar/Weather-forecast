@@ -90,11 +90,11 @@ class ForecastViewController: UITableViewController, CLLocationManagerDelegate {
             
             // set temprature in they format
             if defaults.stringForKey("TempratureUnit") == "Celsius"{
-                forecastCell.tempratureLabel.text = String(format:"%d", self.tempratureConverter.convertTemperatures(dayForecast.tempratue,  source:"Kelvin", target:"Celsius"))
+                forecastCell.tempratureLabel.text = String(format:"%.0f°", self.tempratureConverter.convertTemperatures(dayForecast.tempratue,  source:"Kelvin", target:"Celsius"))
             } else if self.defaults.stringForKey("TempratureUnit") == "Kelvin" {
                 forecastCell.tempratureLabel.text = String(format:"%gK", dayForecast.tempratue)
             } else {
-                forecastCell.tempratureLabel.text = String(format:"%g℉", self.tempratureConverter.convertTemperatures( dayForecast.tempratue,  source:"Kelvin", target:"Fahrenheit"))
+                forecastCell.tempratureLabel.text = String(format:"%.1f℉", self.tempratureConverter.convertTemperatures( dayForecast.tempratue,  source:"Kelvin", target:"Fahrenheit"))
             }
             // set image when description contain key word
             let lowercaseDescription = dayForecast.description.lowercaseString

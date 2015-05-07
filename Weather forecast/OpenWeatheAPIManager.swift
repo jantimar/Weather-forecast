@@ -21,13 +21,19 @@ class OpenWeatheAPIManager: NSObject {
         var city: String
         var counrty: String
         var description: String
-        var temprature: Float
-        var humidity: Float
-        var pressure: Float
-        var windSpeed: Float
-        var windDeggree: Float
-        var rain: Float
-        var clouds: Float
+        var temprature: Float?
+        var humidity: Float?
+        var pressure: Float?
+        var windSpeed: Float?
+        var windDeggree: Float?
+        var rain: Float?
+        var clouds: Float?
+        
+        init() {
+            city = ""
+            counrty = ""
+            description = ""
+        }
     }
     
     struct Forecasts {
@@ -144,7 +150,7 @@ class OpenWeatheAPIManager: NSObject {
                             options: NSJSONReadingOptions.AllowFragments,
                             error:&parseError) as? [String: AnyObject] {
                                 
-                                var weatherState = WeatherState(city: "", counrty: "", description: "", temprature: 0.0, humidity: 0.0, pressure: 0.0, windSpeed: 0.0, windDeggree: 0.0, rain: 0.0, clouds: 0.0)
+                                var weatherState = WeatherState()
                                 
                                 
                                 if let cityName = parsedJsonInDictionary["name"] as? String {
@@ -156,23 +162,13 @@ class OpenWeatheAPIManager: NSObject {
                                     }
                                 }
                                 if let wind = parsedJsonInDictionary["wind"] as? [String:Float] {
-                                    if let windSpeed = wind["speed"] {
-                                        weatherState.windSpeed = windSpeed
-                                    }
-                                    if let windDegrees = wind["deg"] {
-                                        weatherState.windDeggree = windDegrees
-                                    }
+                                    weatherState.windSpeed = wind["speed"]
+                                    weatherState.windDeggree = wind["deg"]
                                 }
                                 if let main = parsedJsonInDictionary["main"] as? [String:Float] {
-                                    if let temprature = main["temp"] {
-                                        weatherState.temprature = temprature
-                                        if let pressure = main["pressure"] {
-                                            weatherState.pressure = pressure
-                                        }
-                                        if let humidity = main["humidity"] {
-                                            weatherState.humidity = humidity
-                                        }
-                                    }
+                                    weatherState.temprature = main["temp"]
+                                    weatherState.pressure = main["pressure"]
+                                    weatherState.humidity = main["humidity"]
                                 }
                                 
                                 if let weather = parsedJsonInDictionary["weather"] as? [AnyObject]{
@@ -183,14 +179,9 @@ class OpenWeatheAPIManager: NSObject {
                                     }
                                 }
                                 if let clouds = parsedJsonInDictionary["clouds"] as? [String:Float] {
-                                    if let cloudsAll = clouds["all"] {
-                                        weatherState.clouds = cloudsAll
-                                    }
-                                }
+                                    weatherState.clouds = clouds["all"]                                }
                                 if let rain = parsedJsonInDictionary["rain"] as? [String:Float]{
-                                    if let last3Hours = rain["3h"] {
-                                        weatherState.rain = last3Hours
-                                    }
+                                    weatherState.rain = rain["3h"]
                                 }
                                 
                                 loadedWeather(weatherState)

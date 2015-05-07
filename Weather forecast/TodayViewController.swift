@@ -85,24 +85,34 @@ class TodayViewController: UIViewController, CLLocationManagerDelegate {
             
             
             
+            if weatherState.temprature != nil {
             if self.defaults.stringForKey("TempratureUnit") == "Celsius"{
-                self.descriptionLabel.text = String(format:"%.1f℃ | %@", self.tempratureConverter.convertTemperatures(weatherState.temprature,  source:"Kelvin", target:"Celsius"),weatherState.description)
+                self.descriptionLabel.text = String(format:"%.1f℃ | %@", self.tempratureConverter.convertTemperatures(weatherState.temprature!,  source:"Kelvin", target:"Celsius"),weatherState.description)
             } else if self.defaults.stringForKey("TempratureUnit") == "Kelvin" {
-                self.descriptionLabel.text = String(format:"%.1fK | %@", weatherState.temprature,weatherState.description)
+                self.descriptionLabel.text = String(format:"%gfK | %@", weatherState.temprature!,weatherState.description)
             } else {
-                self.descriptionLabel.text = String(format:"%g℉ | %@", self.tempratureConverter.convertTemperatures(weatherState.temprature,  source:"Kelvin", target:"Fahrenheit"),weatherState.description)
+                self.descriptionLabel.text = String(format:"%.1f℉ | %@", self.tempratureConverter.convertTemperatures(weatherState.temprature!,  source:"Kelvin", target:"Fahrenheit"),weatherState.description)
+            }
+            } else {
+                self.descriptionLabel.text = weatherState.description
             }
             
-            self.cloudsAllLabel.text = String(format:"%g%%",weatherState.clouds)
-            self.rainLabel.text = String(format:"%g mm",weatherState.rain)
+            self.cloudsAllLabel.text = weatherState.clouds != nil ? String(format:"%g%%",weatherState.clouds!) : "-"
+            
+            self.rainLabel.text =  weatherState.rain != nil ? String(format:"%g mm",weatherState.rain!) : "-"
             
             //0.621371192 - kph to - mph contant
+            if weatherState.windSpeed != nil {
             if self.defaults.stringForKey("LengthUnit") == "Miles"{
-                self.windSpeedLabel.text = String(format:"%.1f mph",weatherState.windSpeed/0.621371192)
+                self.windSpeedLabel.text = String(format:"%.1f mph",weatherState.windSpeed!/0.621371192)
             } else {
-                self.windSpeedLabel.text = String(format:"%g km/h",weatherState.windSpeed)
+                self.windSpeedLabel.text = String(format:"%g km/h",weatherState.windSpeed!)
             }
-            self.pressureLabel.text = String(format:"%g hPa",weatherState.pressure)
+            } else {
+                self.windSpeedLabel.text = "-"
+            }
+            
+            self.pressureLabel.text = weatherState.pressure != nil ? String(format:"%g hPa",weatherState.pressure!) : "-"
             
             let lowercaseDescription = weatherState.description.lowercaseString
             if lowercaseDescription.rangeOfString("cloud") != nil {
