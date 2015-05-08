@@ -73,20 +73,6 @@ class SettignsTableViewController: UITableViewController {
             tempratureType = .Celsius
         }
         
-//        LengthType(rawValue: defaults.stringForKey(Constants.LengthUnitKey)!)
-//        if let length = defaults.objectForKey(Constants.LengthUnitKey) as? LengthType {
-//            lengthType = length
-//        } else { // set default value
-//            lengthType = LengthType.Meters
-//        }
-        
-        // load value from user defaults
-//        if let temprature = defaults.objectForKey(Constants.TempratureUnitKey) as? TempratureType {
-//            tempratureType = temprature
-//        } else {    // set default value
-//            tempratureType = TempratureType.Celsius
-//        }
-        
         // set gestures
         var swipeRight = UISwipeGestureRecognizer(target: self, action: "swipeGesture:")
         swipeRight.direction = .Right

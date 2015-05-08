@@ -125,4 +125,8 @@ class SearchTableViewController: UITableViewController, UISearchBarDelegate {
         searchBar.resignFirstResponder()
     }
 
+    // MARK: Buttons press
+    @IBAction func closeButtonPress(sender: UIBarButtonItem) {
+        self.dismissViewControllerAnimated(true, completion:nil)
+    }
 }

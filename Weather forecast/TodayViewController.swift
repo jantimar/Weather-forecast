@@ -13,23 +13,16 @@ class TodayViewController: UIViewController, CLLocationManagerDelegate {
 
     // MARK: properties
     
-    @IBOutlet weak var currentImageView: UIImageView!
     
     @IBOutlet weak var cityStateLabel: UILabel!
     
     @IBOutlet weak var descriptionLabel: UILabel!
     
-    @IBOutlet weak var cloudsAllLabel: UILabel!
+    @IBOutlet weak var currentImageView: UIImageView!
     
-    @IBOutlet weak var rainLabel: UILabel!
+    @IBOutlet weak var weatherIconImageView: UIImageView!
     
-    @IBOutlet weak var windSpeedLabel: UILabel!
-    
-    @IBOutlet weak var windDirectionLabel: UILabel!
-    
-    @IBOutlet weak var pressureLabel: UILabel!
-    
-    @IBOutlet weak var weatherIcon: UIImageView!
+    @IBOutlet weak var weatherStateView: ActualWeatherStateView!
     
     private lazy var openWeatherAPIManager: OpenWeatheAPIManager = {        // lazy initialization
         let lazilyOpenWeatherAPIManager = OpenWeatheAPIManager()
@@ -100,85 +93,33 @@ class TodayViewController: UIViewController, CLLocationManagerDelegate {
                 self.descriptionLabel.text = weatherState.description
             }
             
-            self.cloudsAllLabel.text = weatherState.clouds != nil ? String(format:"%g%%",weatherState.clouds!) : "-"
-            
-            self.rainLabel.text =  weatherState.rain != nil ? String(format:"%g mm",weatherState.rain!) : "-"
-            
-            //0.621371192 - kph to - mph contant
-            if weatherState.windSpeed != nil {
-                if let lengthTypeRawValue = self.defaults.stringForKey(Constants.LengthUnitKey) {
-                    switch SettignsTableViewController.LengthType(rawValue: lengthTypeRawValue)! {
-                    case .Miles: self.windSpeedLabel.text = String(format:"%.1f mph",weatherState.windSpeed!/0.621371192)
-                    case .Meters: fallthrough
-                    default: self.windSpeedLabel.text = String(format:"%g km/h",weatherState.windSpeed!)
-                    }
-                } else {
-                    self.windSpeedLabel.text = String(format:"%g km/h",weatherState.windSpeed!)
-                }
-            } else {
-                self.windSpeedLabel.text = "-"
-            }
-            
-            self.pressureLabel.text = weatherState.pressure != nil ? String(format:"%g hPa",weatherState.pressure!) : "-"
             
             let lowercaseDescription = weatherState.description.lowercaseString
             if lowercaseDescription.rangeOfString("cloud") != nil {
-                self.weatherIcon.image = UIImage(named: "Cloudy_Big")
+                self.weatherIconImageView.image = UIImage(named: "Cloudy_Big")
             } else if lowercaseDescription.rangeOfString("light") != nil {
-                self.weatherIcon.image = UIImage(named: "Lightning_Big")
+                self.weatherIconImageView.image = UIImage(named: "Lightning_Big")
             } else if lowercaseDescription.rangeOfString("wind") != nil {
-                self.weatherIcon.image = UIImage(named: "WInd_Big")
+                self.weatherIconImageView.image = UIImage(named: "WInd_Big")
             } else {
-                self.weatherIcon.image = UIImage(named: "Sun_Big")
+                self.weatherIconImageView.image = UIImage(named: "Sun_Big")
             }
             
-            // wind direction
-            if weatherState.windDeggree > 348.75 || weatherState.windDeggree <= 11.25 {
-                self.windDirectionLabel.text = "N"
-            } else if weatherState.windDeggree > 11.2 && weatherState.windDeggree <= 33.75 {
-                self.windDirectionLabel.text = "NNE"
-            } else if weatherState.windDeggree > 33.75 && weatherState.windDeggree <= 56.25 {
-                self.windDirectionLabel.text = "NE"
-            } else if weatherState.windDeggree > 56.25 && weatherState.windDeggree <= 78.75 {
-                self.windDirectionLabel.text = "ENE"
-            } else if weatherState.windDeggree > 78.75 && weatherState.windDeggree <= 101.25 {
-                self.windDirectionLabel.text = "E"
-            } else if weatherState.windDeggree > 101.25 && weatherState.windDeggree <= 123.75 {
-                self.windDirectionLabel.text = "ESE"
-            } else if weatherState.windDeggree > 123.75 && weatherState.windDeggree <= 146.25 {
-                self.windDirectionLabel.text = "SE"
-            } else if weatherState.windDeggree > 146.25 && weatherState.windDeggree <= 168.75 {
-                self.windDirectionLabel.text = "SSE"
-            } else if weatherState.windDeggree > 168.75 && weatherState.windDeggree <= 191.25 {
-                self.windDirectionLabel.text = "S"
-            } else if weatherState.windDeggree > 191.25 && weatherState.windDeggree <= 213.75 {
-                self.windDirectionLabel.text = "SSW"
-            } else if weatherState.windDeggree > 213.75 && weatherState.windDeggree <= 236.25 {
-                self.windDirectionLabel.text = "SW"
-            } else if weatherState.windDeggree > 236.25 && weatherState.windDeggree <= 258.75 {
-                self.windDirectionLabel.text = "WSW"
-            } else if weatherState.windDeggree > 258.75 && weatherState.windDeggree <= 281.25 {
-                self.windDirectionLabel.text = "W"
-            } else if weatherState.windDeggree > 281.25 && weatherState.windDeggree <= 303.75 {
-                self.windDirectionLabel.text = "WNW"
-            } else if weatherState.windDeggree > 303.75 && weatherState.windDeggree <= 326.25 {
-                self.windDirectionLabel.text = "NW"
-            } else if weatherState.windDeggree > 326.25 && weatherState.windDeggree <= 348.75 {
-                self.windDirectionLabel.text = "NNW"
-            }
-            
+            self.weatherStateView.updateWeathes(weatherState)
         })
     }
     
     // MARK: Buttons press
     
     @IBAction func shareButtonPress(sender: AnyObject) {
-        let textToShare = "Weather forecast \(descriptionLabel.text!) in \(cityStateLabel.text!)"
-        
-        let activityVC = UIActivityViewController(activityItems: [textToShare], applicationActivities: nil)
-        
-        
-        self.presentViewController(activityVC, animated: true, completion: nil)
+        if descriptionLabel.text != nil && cityStateLabel.text != nil {
+            let textToShare = "Weather forecast \(descriptionLabel.text!) in \(cityStateLabel.text!)"
+            
+            let activityVC = UIActivityViewController(activityItems: [textToShare], applicationActivities: nil)
+            
+            
+            self.presentViewController(activityVC, animated: true, completion: nil)
+        }
     }
     
     // MARK: Gestures
