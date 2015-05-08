@@ -52,7 +52,7 @@ class TodayViewController: UIViewController, CLLocationManagerDelegate {
     override func viewWillAppear(animated: Bool) {
         super.viewWillAppear(animated)
         
-        let useCurrentPositionForWeather = defaults.boolForKey("useCurrentPositionForWeather")
+        let useCurrentPositionForWeather = defaults.boolForKey(Constants.UsingUserPositionKey)
 
         if useCurrentPositionForWeather
         {
@@ -81,18 +81,21 @@ class TodayViewController: UIViewController, CLLocationManagerDelegate {
     
     private func updateUI(weatherState: OpenWeatheAPIManager.WeatherState) {
         dispatch_async(dispatch_get_main_queue(), { () -> Void in
-                        self.cityStateLabel.text = "\(weatherState.city), \(weatherState.counrty)"
+            self.cityStateLabel.text = "\(weatherState.city), \(weatherState.counrty)"
             
             
             
             if weatherState.temprature != nil {
-            if self.defaults.stringForKey("TempratureUnit") == "Celsius"{
-                self.descriptionLabel.text = String(format:"%.1f℃ | %@", self.tempratureConverter.convertTemperatures(weatherState.temprature!,  source:"Kelvin", target:"Celsius"),weatherState.description)
-            } else if self.defaults.stringForKey("TempratureUnit") == "Kelvin" {
-                self.descriptionLabel.text = String(format:"%gfK | %@", weatherState.temprature!,weatherState.description)
-            } else {
-                self.descriptionLabel.text = String(format:"%.1f℉ | %@", self.tempratureConverter.convertTemperatures(weatherState.temprature!,  source:"Kelvin", target:"Fahrenheit"),weatherState.description)
-            }
+                if let tempratureTypeRawValue = self.defaults.stringForKey(Constants.TempratureUnitKey) {
+                    switch SettignsTableViewController.TempratureType(rawValue: tempratureTypeRawValue)! {
+                    case .Kelvin: self.descriptionLabel.text = String(format:"%.1fK | %@", weatherState.temprature!,weatherState.description)
+                    case .Fahrenheit: self.descriptionLabel.text = String(format:"%.1f℉ | %@", self.tempratureConverter.convertTemperatures(weatherState.temprature!,  source:"Kelvin", target:"Fahrenheit"),weatherState.description)
+                    case .Celsius: fallthrough
+                    default: self.descriptionLabel.text = String(format:"%.1f℃ | %@", self.tempratureConverter.convertTemperatures(weatherState.temprature!,  source:"Kelvin", target:"Celsius"),weatherState.description)
+                    }
+                } else {
+                    self.descriptionLabel.text = String(format:"%.1f℃ | %@", self.tempratureConverter.convertTemperatures(weatherState.temprature!,  source:"Kelvin", target:"Celsius"),weatherState.description)
+                }
             } else {
                 self.descriptionLabel.text = weatherState.description
             }
@@ -103,11 +106,15 @@ class TodayViewController: UIViewController, CLLocationManagerDelegate {
             
             //0.621371192 - kph to - mph contant
             if weatherState.windSpeed != nil {
-            if self.defaults.stringForKey("LengthUnit") == "Miles"{
-                self.windSpeedLabel.text = String(format:"%.1f mph",weatherState.windSpeed!/0.621371192)
-            } else {
-                self.windSpeedLabel.text = String(format:"%g km/h",weatherState.windSpeed!)
-            }
+                if let lengthTypeRawValue = self.defaults.stringForKey(Constants.LengthUnitKey) {
+                    switch SettignsTableViewController.LengthType(rawValue: lengthTypeRawValue)! {
+                    case .Miles: self.windSpeedLabel.text = String(format:"%.1f mph",weatherState.windSpeed!/0.621371192)
+                    case .Meters: fallthrough
+                    default: self.windSpeedLabel.text = String(format:"%g km/h",weatherState.windSpeed!)
+                    }
+                } else {
+                    self.windSpeedLabel.text = String(format:"%g km/h",weatherState.windSpeed!)
+                }
             } else {
                 self.windSpeedLabel.text = "-"
             }
@@ -163,7 +170,7 @@ class TodayViewController: UIViewController, CLLocationManagerDelegate {
         })
     }
     
-    // MARK: Buttons press 
+    // MARK: Buttons press
     
     @IBAction func shareButtonPress(sender: AnyObject) {
         let textToShare = "Weather forecast \(descriptionLabel.text!) in \(cityStateLabel.text!)"
@@ -173,4 +180,20 @@ class TodayViewController: UIViewController, CLLocationManagerDelegate {
         
         self.presentViewController(activityVC, animated: true, completion: nil)
     }
+    
+    // MARK: Gestures
+    
+    @IBAction func swipeGesture(sender: UISwipeGestureRecognizer) {
+        if let appDelegate = UIApplication.sharedApplication().delegate as? AppDelegate {
+            if let tabBarController = appDelegate.window?.rootViewController as? UITabBarController {
+                
+                switch sender.direction {
+                case UISwipeGestureRecognizerDirection.Left: tabBarController.selectedIndex = 1
+                case UISwipeGestureRecognizerDirection.Right: tabBarController.selectedIndex = 2
+                default: break
+                }
+            }
+        }
+    }
+
 }

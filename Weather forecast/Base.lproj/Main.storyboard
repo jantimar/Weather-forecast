@@ -239,6 +239,7 @@
                             </view>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                        <gestureRecognizers/>
                         <constraints>
                             <constraint firstItem="zUP-GV-68d" firstAttribute="top" secondItem="xA0-8V-cRx" secondAttribute="bottom" id="16h-eu-APL"/>
                             <constraint firstAttribute="centerX" secondItem="jKZ-d3-p2a" secondAttribute="centerX" id="2L2-ZX-FQi"/>
@@ -293,6 +294,10 @@
                             <constraint firstItem="dP5-7M-HJf" firstAttribute="height" secondItem="BKC-0D-wN2" secondAttribute="height" id="yfr-Xp-w1S"/>
                             <constraint firstItem="zUP-GV-68d" firstAttribute="height" secondItem="BKC-0D-wN2" secondAttribute="height" id="yqv-tc-zI9"/>
                         </constraints>
+                        <connections>
+                            <outletCollection property="gestureRecognizers" destination="mQh-op-GTe" appends="YES" id="1Ht-Gn-52E"/>
+                            <outletCollection property="gestureRecognizers" destination="7zh-3c-8Ed" appends="YES" id="w9D-3i-OUZ"/>
+                        </connections>
                     </view>
                     <navigationItem key="navigationItem" title="Today" id="vBU-pi-4OS">
                         <barButtonItem key="rightBarButtonItem" image="Location" id="NcM-vP-YsA"/>
@@ -310,6 +315,16 @@
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="LSY-4h-i3e" userLabel="First Responder" sceneMemberID="firstResponder"/>
+                <swipeGestureRecognizer direction="right" id="mQh-op-GTe">
+                    <connections>
+                        <action selector="swipeGesture:" destination="6e5-vP-wCR" id="G2s-NU-6uR"/>
+                    </connections>
+                </swipeGestureRecognizer>
+                <swipeGestureRecognizer direction="left" id="7zh-3c-8Ed">
+                    <connections>
+                        <action selector="swipeGesture:" destination="6e5-vP-wCR" id="eIK-jx-KWU"/>
+                    </connections>
+                </swipeGestureRecognizer>
             </objects>
             <point key="canvasLocation" x="950" y="-546"/>
         </scene>
@@ -335,24 +350,24 @@
                                                 <constraint firstAttribute="width" secondItem="Gff-k3-rf7" secondAttribute="height" multiplier="1:1" id="f2q-4A-U3Q"/>
                                             </constraints>
                                         </imageView>
-                                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Day" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" minimumFontSize="9" translatesAutoresizingMaskIntoConstraints="NO" id="ZYB-XX-Eq6">
-                                            <rect key="frame" x="85" y="13" width="32" height="18"/>
+                                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" misplaced="YES" text="Day" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" minimumFontSize="9" translatesAutoresizingMaskIntoConstraints="NO" id="ZYB-XX-Eq6">
+                                            <rect key="frame" x="85" y="10" width="32" height="21"/>
                                             <fontDescription key="fontDescription" name="ProximaNova-Semibold" family="Proxima Nova" pointSize="18"/>
                                             <color key="textColor" red="0.20000000000000001" green="0.20000000000000001" blue="0.20000000000000001" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                             <nil key="highlightedColor"/>
                                         </label>
-                                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Weather" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" minimumFontSize="8" translatesAutoresizingMaskIntoConstraints="NO" id="nX1-gi-6HO">
-                                            <rect key="frame" x="85" y="39" width="56" height="15"/>
+                                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" misplaced="YES" text="Weather" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" minimumFontSize="8" translatesAutoresizingMaskIntoConstraints="NO" id="nX1-gi-6HO">
+                                            <rect key="frame" x="85" y="39" width="56" height="18"/>
                                             <fontDescription key="fontDescription" name="ProximaNova-Regular" family="Proxima Nova" pointSize="15"/>
                                             <color key="textColor" red="0.20000000000000001" green="0.20000000000000001" blue="0.20000000000000001" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                             <nil key="highlightedColor"/>
                                         </label>
-                                        <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Slb-2R-EOl">
-                                            <rect key="frame" x="77" y="0.0" width="32" height="5"/>
+                                        <view contentMode="scaleToFill" misplaced="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Slb-2R-EOl">
+                                            <rect key="frame" x="77" y="0.0" width="32" height="2"/>
                                             <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                         </view>
-                                        <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="X6e-w6-YDx">
-                                            <rect key="frame" x="77" y="62" width="32" height="5"/>
+                                        <view contentMode="scaleToFill" misplaced="YES" translatesAutoresizingMaskIntoConstraints="NO" id="X6e-w6-YDx">
+                                            <rect key="frame" x="77" y="65" width="32" height="2"/>
                                             <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                         </view>
                                         <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="22" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" minimumFontSize="10" translatesAutoresizingMaskIntoConstraints="NO" id="FHy-TC-25e">
@@ -432,14 +447,14 @@
                                 <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="BFC-iY-T98" id="RLS-7A-yh5">
                                     <autoresizingMask key="autoresizingMask"/>
                                     <subviews>
-                                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="New york" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="IAa-bt-L6c">
-                                            <rect key="frame" x="8" y="13" width="73" height="17"/>
+                                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" misplaced="YES" text="New york" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="IAa-bt-L6c">
+                                            <rect key="frame" x="8" y="12" width="72" height="20"/>
                                             <fontDescription key="fontDescription" name="ProximaNova-Bold" family="Proxima Nova" pointSize="17"/>
                                             <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
                                             <nil key="highlightedColor"/>
                                         </label>
-                                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="New york" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="0iR-qq-qHT">
-                                            <rect key="frame" x="89" y="13" width="71" height="17"/>
+                                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" misplaced="YES" text="New york" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="0iR-qq-qHT">
+                                            <rect key="frame" x="88" y="12" width="72" height="20"/>
                                             <fontDescription key="fontDescription" name="ProximaNova-Light" family="Proxima Nova" pointSize="17"/>
                                             <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
                                             <nil key="highlightedColor"/>

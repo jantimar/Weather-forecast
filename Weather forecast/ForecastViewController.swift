@@ -46,7 +46,7 @@ class ForecastViewController: UITableViewController, CLLocationManagerDelegate {
     override func viewWillAppear(animated: Bool) {
         super.viewWillAppear(animated)
         
-        let useCurrentPositionForWeather = defaults.boolForKey("useCurrentPositionForWeather")
+        let useCurrentPositionForWeather = defaults.boolForKey(Constants.UsingUserPositionKey)
         
         if useCurrentPositionForWeather
         {
@@ -61,6 +61,18 @@ class ForecastViewController: UITableViewController, CLLocationManagerDelegate {
         super.viewWillDisappear(animated)
         
         locationManager.stopUpdatingLocation()
+    }
+    
+    override func viewDidLoad() {
+         super.viewDidLoad()
+        
+        var swipeRight = UISwipeGestureRecognizer(target: self, action: "swipeGesture:")
+        swipeRight.direction = .Right
+        self.tableView?.addGestureRecognizer(swipeRight)
+        
+        var swipeLeft = UISwipeGestureRecognizer(target: self, action: "swipeGesture:")
+        swipeLeft.direction = .Left
+        self.tableView?.addGestureRecognizer(swipeLeft)
     }
     
     // MARK: Locations delegate
@@ -83,19 +95,24 @@ class ForecastViewController: UITableViewController, CLLocationManagerDelegate {
     
     
     override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCellWithIdentifier("ForecastTableViewCelldentifire", forIndexPath: indexPath) as! UITableViewCell
+        let cell = tableView.dequeueReusableCellWithIdentifier(Constants.ForecastCelldentifire, forIndexPath: indexPath) as! UITableViewCell
         
         if let forecastCell = cell as? ForecastTableViewCell {
             let dayForecast = forecasts.forecast[indexPath.row]
             
-            // set temprature in they format
-            if defaults.stringForKey("TempratureUnit") == "Celsius"{
-                forecastCell.tempratureLabel.text = String(format:"%.0f°", self.tempratureConverter.convertTemperatures(dayForecast.tempratue,  source:"Kelvin", target:"Celsius"))
-            } else if self.defaults.stringForKey("TempratureUnit") == "Kelvin" {
-                forecastCell.tempratureLabel.text = String(format:"%gK", dayForecast.tempratue)
+            // set temprature in format
+            if let tempratureTypeRawValue = self.defaults.stringForKey(Constants.TempratureUnitKey) {
+                switch SettignsTableViewController.TempratureType(rawValue: tempratureTypeRawValue)! {
+                case .Celsius: String(format:"%.0f°", self.tempratureConverter.convertTemperatures(dayForecast.tempratue,  source:"Kelvin", target:"Celsius"))
+                case .Kelvin: forecastCell.tempratureLabel.text = String(format:"%gK", dayForecast.tempratue)
+                case .Fahrenheit: forecastCell.tempratureLabel.text = String(format:"%.1f℉", self.tempratureConverter.convertTemperatures( dayForecast.tempratue,  source:"Kelvin", target:"Fahrenheit"))
+                case .Celsius: fallthrough
+                default: String(format:"%.0f°", self.tempratureConverter.convertTemperatures(dayForecast.tempratue,  source:"Kelvin", target:"Celsius"))
+                }
             } else {
-                forecastCell.tempratureLabel.text = String(format:"%.1f℉", self.tempratureConverter.convertTemperatures( dayForecast.tempratue,  source:"Kelvin", target:"Fahrenheit"))
+                forecastCell.tempratureLabel.text = String(format:"%.0f°", self.tempratureConverter.convertTemperatures(dayForecast.tempratue,  source:"Kelvin", target:"Celsius"))
             }
+            
             // set image when description contain key word
             let lowercaseDescription = dayForecast.description.lowercaseString
             if lowercaseDescription.rangeOfString("cloud") != nil {
@@ -127,5 +144,19 @@ class ForecastViewController: UITableViewController, CLLocationManagerDelegate {
         dateFormatter.dateFormat = "EEEE"
         let today = NSDate()
         return dateFormatter.stringFromDate(today.dateByAddingTimeInterval(NSTimeInterval(60*60*24*daysFromToday)))
+    }
+    
+    // MARK: Gestures
+    @IBAction func swipeGesture(sender: UISwipeGestureRecognizer) {
+        if let appDelegate = UIApplication.sharedApplication().delegate as? AppDelegate {
+            if let tabBarController = appDelegate.window?.rootViewController as? UITabBarController {
+                
+                switch sender.direction {
+                case UISwipeGestureRecognizerDirection.Left: tabBarController.selectedIndex = 2
+                case UISwipeGestureRecognizerDirection.Right: tabBarController.selectedIndex = 0
+                default: break
+                }
+            }
+        }
     }
 }

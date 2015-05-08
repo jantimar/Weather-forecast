@@ -89,7 +89,7 @@ class SearchTableViewController: UITableViewController, UISearchBarDelegate {
 
     
     override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCellWithIdentifier("FoundCityCellIdentifire", forIndexPath: indexPath) as! UITableViewCell
+        let cell = tableView.dequeueReusableCellWithIdentifier(Constants.FoundCityCellIdentifire, forIndexPath: indexPath) as! UITableViewCell
 
         if let foundCityCell = cell as? FoundCityTableViewCell {
                 foundCityCell.country.text = cities[indexPath.row].counrty

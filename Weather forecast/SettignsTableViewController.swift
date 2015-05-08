@@ -12,7 +12,35 @@ class SettignsTableViewController: UITableViewController {
     
     
     // MARK: Properties
-
+    enum TempratureType: String {
+        case Kelvin = "Kelvin"
+        case Celsius = "Celsius"
+        case Fahrenheit = "Fahrenheit"
+    }
+    
+    enum LengthType: String {
+        case Meters = "Meters"
+        case Miles = "Miles"
+    }
+    
+    private var lengthType: LengthType? {
+        didSet {
+            if lengthType != nil {
+                lengthButton.setTitle(lengthType!.rawValue, forState: .Normal)
+                defaults.setObject(lengthType!.rawValue, forKey: Constants.LengthUnitKey)
+            }
+        }
+    }
+    
+    private var tempratureType: TempratureType? {
+        didSet {
+            if tempratureType != nil {
+                tempretureButton.setTitle(tempratureType!.rawValue, forState: .Normal)
+                defaults.setObject(tempratureType!.rawValue, forKey: Constants.TempratureUnitKey)
+            }
+        }
+    }
+    
     private var defaults = NSUserDefaults.standardUserDefaults()
     
     @IBOutlet weak var tempretureButton: UIButton!
@@ -29,50 +57,88 @@ class SettignsTableViewController: UITableViewController {
     
     // MARK: Life cycle methods
     
-    override func viewWillAppear(animated: Bool) {
-        super.viewWillAppear(animated)
-        // show actual states on buttons
-        if let lengthUnit = defaults.stringForKey("LengthUnit") {
-            lengthButton.setTitle(lengthUnit, forState: .Normal)
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        
+        // load value from user defaults
+        if let lengthTypeRawValue = defaults.stringForKey(Constants.LengthUnitKey) {
+            lengthType = LengthType(rawValue: lengthTypeRawValue)
+        } else {
+            lengthType = .Meters
         }
         
-        if let tempratureUnit = defaults.stringForKey("TempratureUnit") {
-            tempretureButton.setTitle(tempratureUnit, forState: .Normal)
+        if let tempratureTypeRawValue = defaults.stringForKey(Constants.TempratureUnitKey) {
+            tempratureType = TempratureType(rawValue: tempratureTypeRawValue)
+        } else {
+            tempratureType = .Celsius
         }
+        
+//        LengthType(rawValue: defaults.stringForKey(Constants.LengthUnitKey)!)
+//        if let length = defaults.objectForKey(Constants.LengthUnitKey) as? LengthType {
+//            lengthType = length
+//        } else { // set default value
+//            lengthType = LengthType.Meters
+//        }
+        
+        // load value from user defaults
+//        if let temprature = defaults.objectForKey(Constants.TempratureUnitKey) as? TempratureType {
+//            tempratureType = temprature
+//        } else {    // set default value
+//            tempratureType = TempratureType.Celsius
+//        }
+        
+        // set gestures
+        var swipeRight = UISwipeGestureRecognizer(target: self, action: "swipeGesture:")
+        swipeRight.direction = .Right
+        self.tableView?.addGestureRecognizer(swipeRight)
+        
+        var swipeLeft = UISwipeGestureRecognizer(target: self, action: "swipeGesture:")
+        swipeLeft.direction = .Left
+        self.tableView?.addGestureRecognizer(swipeLeft)
     }
     
-    // MARK: Buttons press 
+    // MARK: Buttons press
     
     @IBAction func lengthUnitPress(sender: UIButton) {
-        
-        switch sender.titleForState(.Normal)! {
-        case "Miles":
-            sender.setTitle("Meters", forState: .Normal)
-            defaults.setValue("Meters", forKey: "LengthUnit")
-        case "Meters": fallthrough
-        default:
-            sender.setTitle("Miles", forState: .Normal)
-            defaults.setValue("Miles", forKey: "LengthUnit")
-            
+        if lengthType != nil {
+            switch lengthType! {
+            case .Miles:
+                lengthType = .Meters
+            case .Meters: fallthrough
+            default:
+                lengthType = .Miles
+            }
         }
     }
     
     
     @IBAction func unitOfTempreturePress(sender: UIButton) {
-        switch sender.titleForState(.Normal)! {
-        case "Fahrenheit":
-            sender.setTitle("Celsius", forState: .Normal)
-            defaults.setValue("Celsius", forKey: "TempratureUnit")
-        case "Kelvin":
-            sender.setTitle("Fahrenheit", forState: .Normal)
-            defaults.setValue("Fahrenheit", forKey: "TempratureUnit")
-        case "Celsius": fallthrough
-        default:
-            sender.setTitle("Kelvin", forState: .Normal)
-            defaults.setValue("Kelvin", forKey: "TempratureUnit")
-            
+        if tempratureType != nil {
+            switch tempratureType! {
+            case .Fahrenheit:
+                tempratureType = .Kelvin
+            case .Kelvin:
+                tempratureType = .Celsius
+            case .Celsius: fallthrough
+            default:
+                tempratureType = .Fahrenheit
+            }
         }
-        
     }
     
+    // MARK: Gestures
+    
+    @IBAction func swipeGesture(sender: UISwipeGestureRecognizer) {
+        if let appDelegate = UIApplication.sharedApplication().delegate as? AppDelegate {
+            if let tabBarController = appDelegate.window?.rootViewController as? UITabBarController {
+                
+                switch sender.direction {
+                case UISwipeGestureRecognizerDirection.Left: tabBarController.selectedIndex = 0
+                case UISwipeGestureRecognizerDirection.Right: tabBarController.selectedIndex = 1
+                default: break
+                }
+            }
+        }
+    }
+
 }
