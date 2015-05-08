@@ -15,6 +15,8 @@ class OpenWeatheAPIManager: NSObject {
     struct FoundCity {
         var name: String
         var counrty: String
+        var latitude: Double
+        var longitude: Double
     }
     
     struct WeatherState {
@@ -78,7 +80,13 @@ class OpenWeatheAPIManager: NSObject {
                                         if let citySys = city["sys"] as? [String:String] {
                                             if let cityName = city["name"] as? String {
                                                 if let country = citySys["country"] {
-                                                    suitableCities.append(FoundCity(name: cityName, counrty: country))
+                                                    if let coordination = city["coord"] as? [String:Double] {
+                                                        if let latitude = coordination["lat"] {
+                                                            if let longitude = coordination["lon"]{
+                                                                suitableCities.append(FoundCity(name: cityName, counrty: country, latitude: latitude, longitude: longitude))
+                                                        }
+                                                        }
+                                                    }
                                                 }
                                             }
                                         }

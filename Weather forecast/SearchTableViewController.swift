@@ -33,11 +33,6 @@ class SearchTableViewController: UITableViewController, UISearchBarDelegate {
         didSet {
             searchBar.placeholder = "City name"
             
-            var searchBarFrame: CGRect = searchBar.frame
-            searchBarFrame.origin.y += 5.0
-            searchBarFrame.size.height -= 10.0
-            searchBar.frame = searchBarFrame
-            
 //            searchBar.layer.borderColor = UIColor(red: 37.0/255.0, green: 142.0/255.0, blue: 1.0, alpha: 1.0).CGColor
 //            searchBar.layer.borderWidth = 1.0
 //            searchBar.layer.cornerRadius = 5.0
@@ -71,7 +66,6 @@ class SearchTableViewController: UITableViewController, UISearchBarDelegate {
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        
         searchBar = UISearchBar()
         navigationItem.titleView = searchBar
     }
@@ -102,6 +96,27 @@ class SearchTableViewController: UITableViewController, UISearchBarDelegate {
 
     @IBAction func refresh(sender: UIRefreshControl) {
         openWeatherAPIManager.asynchronlySearchCityLike(named: searchBar.text,foundCities: foundedCity)
+    }
+    
+    override func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
+        let foundCity = cities[indexPath.row]
+        // save only if city is not in database
+        if City.MR_findFirstWithPredicate(NSPredicate(format: "name LIKE %@ AND countryCode LIKE %@", argumentArray: [foundCity.name,foundCity.counrty])) == nil {
+            var city = City.MR_createEntity() as! City
+            city.name = foundCity.name
+            city.latitude = foundCity.latitude
+            city.longitude = foundCity.longitude
+            city.countryCode = foundCity.counrty
+            
+            var saveError: NSError?    // check if parsed data is dictionary
+            NSManagedObjectContext.MR_defaultContext().MR_saveToPersistentStoreWithCompletion({ (succes, saveError) -> Void in
+                if saveError == nil {
+                    self.dismissViewControllerAnimated(true, completion: { () -> Void in
+                        //                            SAVE FLOAT VALUES
+                    })
+                }
+            })
+        }
     }
     
 

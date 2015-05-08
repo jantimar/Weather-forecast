@@ -11,7 +11,7 @@ import Foundation
 struct Constants {
     static let TempratureUnitKey = "sk.jantimar.Weather-forecast.TempratureUnitKey"
     static let LengthUnitKey = "sk.jantimar.Weather-forecast.LengthUnitKey"
-    static let ForecastCelldentifire = "ForecastTableViewCelldentifire"
+    static let TempretureCelldentifire = "TempretureTableViewCelldentifire"
     static let FoundCityCellIdentifire = "FoundCityCellIdentifire"
     static let UsingUserPositionKey = "sk.jantimar.Weather-forecast.UsingUserPositionKey"
 }

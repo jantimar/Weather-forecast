@@ -95,39 +95,38 @@ class ForecastViewController: UITableViewController, CLLocationManagerDelegate {
     
     
     override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCellWithIdentifier(Constants.ForecastCelldentifire, forIndexPath: indexPath) as! UITableViewCell
+        let cell = tableView.dequeueReusableCellWithIdentifier(Constants.TempretureCelldentifire, forIndexPath: indexPath) as! UITableViewCell
         
-        if let forecastCell = cell as? ForecastTableViewCell {
+        if let temperatureCell = cell as? TempretureTableViewCell {
             let dayForecast = forecasts.forecast[indexPath.row]
             
             // set temprature in format
             if let tempratureTypeRawValue = self.defaults.stringForKey(Constants.TempratureUnitKey) {
                 switch SettignsTableViewController.TempratureType(rawValue: tempratureTypeRawValue)! {
-                case .Celsius: String(format:"%.0f°", self.tempratureConverter.convertTemperatures(dayForecast.tempratue,  source:"Kelvin", target:"Celsius"))
-                case .Kelvin: forecastCell.tempratureLabel.text = String(format:"%gK", dayForecast.tempratue)
-                case .Fahrenheit: forecastCell.tempratureLabel.text = String(format:"%.1f℉", self.tempratureConverter.convertTemperatures( dayForecast.tempratue,  source:"Kelvin", target:"Fahrenheit"))
+                case .Kelvin: temperatureCell.tempratureLabel.text = String(format:"%gK", dayForecast.tempratue)
+                case .Fahrenheit: temperatureCell.tempratureLabel.text = String(format:"%.1f℉", self.tempratureConverter.convertTemperatures( dayForecast.tempratue,  source:"Kelvin", target:"Fahrenheit"))
                 case .Celsius: fallthrough
-                default: String(format:"%.0f°", self.tempratureConverter.convertTemperatures(dayForecast.tempratue,  source:"Kelvin", target:"Celsius"))
+                default: temperatureCell.tempratureLabel.text = String(format:"%.0f°", self.tempratureConverter.convertTemperatures(dayForecast.tempratue,  source:"Kelvin", target:"Celsius"))
                 }
             } else {
-                forecastCell.tempratureLabel.text = String(format:"%.0f°", self.tempratureConverter.convertTemperatures(dayForecast.tempratue,  source:"Kelvin", target:"Celsius"))
+                temperatureCell.tempratureLabel.text = String(format:"%.0f°", self.tempratureConverter.convertTemperatures(dayForecast.tempratue,  source:"Kelvin", target:"Celsius"))
             }
             
             // set image when description contain key word
             let lowercaseDescription = dayForecast.description.lowercaseString
             if lowercaseDescription.rangeOfString("cloud") != nil {
-                forecastCell.weatherImageView.image = UIImage(named: "Cloudy_Big")
+                temperatureCell.weatherImageView.image = UIImage(named: "Cloudy_Big")
             } else if lowercaseDescription.rangeOfString("light") != nil {
-                forecastCell.weatherImageView.image = UIImage(named: "Lightning_Big")
+                temperatureCell.weatherImageView.image = UIImage(named: "Lightning_Big")
             } else if lowercaseDescription.rangeOfString("wind") != nil {
-                forecastCell.weatherImageView.image = UIImage(named: "WInd_Big")
+                temperatureCell.weatherImageView.image = UIImage(named: "WInd_Big")
             } else {
-                forecastCell.weatherImageView.image = UIImage(named: "Sun_Big")
+                temperatureCell.weatherImageView.image = UIImage(named: "Sun_Big")
             }
             
-            forecastCell.weatherDescriptionLabel.text = dayForecast.description
+            temperatureCell.weatherDescriptionLabel.text = dayForecast.description
             
-            forecastCell.dayLabel.text = dayNameFromToday(indexPath.row)
+            temperatureCell.titleLabel.text = dayNameFromToday(indexPath.row)
         }
         
         return cell
