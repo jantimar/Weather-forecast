@@ -16,6 +16,14 @@ class SettignsTableViewController: UITableViewController {
         case Kelvin = "Kelvin"
         case Celsius = "Celsius"
         case Fahrenheit = "Fahrenheit"
+        
+        func unitSymbol() -> String {
+            switch self {
+            case .Kelvin: return "K"
+            case .Celsius: return "℃"
+            case .Fahrenheit: return "℉"
+            }
+        }
     }
     
     enum LengthType: String {
@@ -26,7 +34,7 @@ class SettignsTableViewController: UITableViewController {
     private var lengthType: LengthType? {
         didSet {
             if lengthType != nil {
-                lengthButton.setTitle(lengthType!.rawValue, forState: .Normal)
+                lengthButton.setTextWithAnimation(lengthType!.rawValue)
                 defaults.setObject(lengthType!.rawValue, forKey: Constants.LengthUnitKey)
             }
         }
@@ -35,7 +43,7 @@ class SettignsTableViewController: UITableViewController {
     private var tempratureType: TempratureType? {
         didSet {
             if tempratureType != nil {
-                tempretureButton.setTitle(tempratureType!.rawValue, forState: .Normal)
+                tempretureButton.setTextWithAnimation(tempratureType!.rawValue)
                 defaults.setObject(tempratureType!.rawValue, forKey: Constants.TempratureUnitKey)
             }
         }

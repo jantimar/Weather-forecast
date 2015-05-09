@@ -81,9 +81,9 @@ class TodayViewController: UIViewController {
             
             if weatherState.temprature != nil {
                 if let tempratureTypeRawValue = self.defaults.stringForKey(Constants.TempratureUnitKey) {
-                    self.descriptionLabel.setTextWithAnimation(String(format:"%@ | %@", weatherState.temprature!.tempratureInFormatFromKelvin(SettignsTableViewController.TempratureType(rawValue: tempratureTypeRawValue)!), weatherState.description))
+                    self.descriptionLabel.setTextWithAnimation(String(format:"%@%@ | %@", weatherState.temprature!.tempratureInFormatFromKelvin(SettignsTableViewController.TempratureType(rawValue: tempratureTypeRawValue)!),SettignsTableViewController.TempratureType(rawValue: tempratureTypeRawValue)!.unitSymbol(), weatherState.description))
                 } else {
-                    self.descriptionLabel.setTextWithAnimation(String(format:"%@ | %@", weatherState.temprature!.tempratureInFormatFromKelvin(.Celsius), weatherState.description))
+                    self.descriptionLabel.setTextWithAnimation(String(format:"%@%@ | %@", weatherState.temprature!.tempratureInFormatFromKelvin(.Celsius),SettignsTableViewController.TempratureType.Celsius.unitSymbol(), weatherState.description))
                 }
             } else {
                 self.descriptionLabel.setTextWithAnimation(weatherState.description)

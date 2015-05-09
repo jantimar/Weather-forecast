@@ -24,6 +24,14 @@ extension UILabel {
     }
 }
 
+extension UIButton {
+    func setTextWithAnimation(text: String) {
+        UIView.transitionWithView(self, duration: Constants.AnimationDuration, options: .TransitionFlipFromTop, animations: { () -> Void in
+            self.setTitle(text, forState: .Normal)
+            }, completion: nil)
+    }
+}
+
 extension UIImage {
     static func weatherImage(description: String) -> UIImage? {
         let lowercaseDescription = description.lowercaseString
@@ -50,10 +58,10 @@ extension UIImageView {
 extension Float {
     func tempratureInFormatFromKelvin(to: SettignsTableViewController.TempratureType) -> String {
         switch to {
-        case .Kelvin: return String(format:"%.1fK",self)
-        case .Fahrenheit: return String(format:"%.1f℉ | %@", TempratureConverter.convertTemperatures(self,  source:"Kelvin", target:"Fahrenheit"))
+        case .Kelvin: return String(format:"%.1f",self)
+        case .Fahrenheit: return String(format:"%.1f", TempratureConverter.convertTemperatures(self,  source:"Kelvin", target:"Fahrenheit"))
         case .Celsius: fallthrough
-        default: return String(format:"%.1f℃", TempratureConverter.convertTemperatures(self,  source:"Kelvin", target:"Celsius"))
+        default: return String(format:"%.1f", TempratureConverter.convertTemperatures(self,  source:"Kelvin", target:"Celsius"))
         }
     }
     

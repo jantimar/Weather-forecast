@@ -94,9 +94,9 @@ class ForecastViewController: UITableViewController {
             
             // set temprature in format
             if let tempratureTypeRawValue = defaults.stringForKey(Constants.TempratureUnitKey) {
-                temperatureCell.tempratureLabel.setTextWithAnimation(String(format:"%@", dayForecast.tempratue.tempratureInFormatFromKelvin(SettignsTableViewController.TempratureType(rawValue: tempratureTypeRawValue)!)))
+                temperatureCell.tempratureLabel.setTextWithAnimation(String(format:"%@°", dayForecast.tempratue.tempratureInFormatFromKelvin(SettignsTableViewController.TempratureType(rawValue: tempratureTypeRawValue)!)))
             } else {
-                temperatureCell.tempratureLabel.setTextWithAnimation(String(format:"%@", dayForecast.tempratue.tempratureInFormatFromKelvin(.Celsius)))
+                temperatureCell.tempratureLabel.setTextWithAnimation(String(format:"%@°", dayForecast.tempratue.tempratureInFormatFromKelvin(.Celsius)))
             }
             
             // set image when description contain key word

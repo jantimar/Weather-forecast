@@ -106,9 +106,9 @@ class LocationViewController: UIViewController, UITableViewDataSource, UITableVi
                     // set temprature in format
                     if weatherState.temprature != nil {
                     if let tempratureTypeRawValue = self.defaults.stringForKey(Constants.TempratureUnitKey) {
-                        cell.tempratureLabel.setTextWithAnimation(String(format:"%@", weatherState.temprature!.tempratureInFormatFromKelvin(SettignsTableViewController.TempratureType(rawValue: tempratureTypeRawValue)!)))
+                        cell.tempratureLabel.setTextWithAnimation(String(format:"%@°", weatherState.temprature!.tempratureInFormatFromKelvin(SettignsTableViewController.TempratureType(rawValue: tempratureTypeRawValue)!)))
                     } else {
-                        cell.tempratureLabel.setTextWithAnimation(String(format:"%@", weatherState.temprature!.tempratureInFormatFromKelvin(.Celsius)))
+                        cell.tempratureLabel.setTextWithAnimation(String(format:"%@°", weatherState.temprature!.tempratureInFormatFromKelvin(.Celsius)))
                     }
                     } else {
                         cell.tempratureLabel.setTextWithAnimation("-")
