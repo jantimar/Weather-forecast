@@ -45,11 +45,16 @@ class TodayViewController: UIViewController, CLLocationManagerDelegate {
     override func viewWillAppear(animated: Bool) {
         super.viewWillAppear(animated)
         
-        let useCurrentPositionForWeather = defaults.boolForKey(Constants.UsingUserPositionKey)
+        let useSpecificPositionForWeather = defaults.boolForKey(Constants.UsingSpecificPositionKey)
 
-        if useCurrentPositionForWeather
+        if useSpecificPositionForWeather
         {
             currentImageView?.alpha = 0.0   // load weather state from saved coordinate
+            
+            let latitude = defaults.doubleForKey(Constants.LatitudeKey)
+            let longitude = defaults.doubleForKey(Constants.LongitudeKey)
+            
+            openWeatherAPIManager.asynchronlyGetWeatherForCoordinate( longitude, latitude: latitude, loadedWeather: updateUI)
             
         } else {
             currentImageView?.alpha = 1.0

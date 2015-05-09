@@ -10,5 +10,4 @@
 #include <Foundation/Foundation.h>
 #import <MGSwipeTableCell/MGSwipeTableCell.h>
 #import <MGSwipeTableCell/MGSwipeButton.h>
-#define MR_ENABLE_ACTIVE_RECORD_LOGGING 0
 #import <MagicalRecord/CoreData+MagicalRecord.h>

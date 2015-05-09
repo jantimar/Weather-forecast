@@ -31,6 +31,7 @@
 		A46EBDDD1AFA19E600FB717B /* ProximaNova-Semibold.otf in Resources */ = {isa = PBXBuildFile; fileRef = A46EBDD91AFA19E600FB717B /* ProximaNova-Semibold.otf */; };
 		A47916801AFCE917006FB39D /* TempretureTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = A479167F1AFCE917006FB39D /* TempretureTableViewCell.swift */; };
 		A47916841AFCEB65006FB39D /* LocationViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A47916831AFCEB65006FB39D /* LocationViewController.swift */; };
+		A4C512171AFE26F50016F965 /* Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = A4C512161AFE26F50016F965 /* Extensions.swift */; };
 		D3EF2905FA154BD5F29CF314 /* Pods.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EE812324B234E79565944187 /* Pods.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
 /* End PBXBuildFile section */
 
@@ -75,6 +76,7 @@
 		A46EBDD91AFA19E600FB717B /* ProximaNova-Semibold.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "ProximaNova-Semibold.otf"; sourceTree = "<group>"; };
 		A479167F1AFCE917006FB39D /* TempretureTableViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TempretureTableViewCell.swift; sourceTree = "<group>"; };
 		A47916831AFCEB65006FB39D /* LocationViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LocationViewController.swift; sourceTree = "<group>"; };
+		A4C512161AFE26F50016F965 /* Extensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Extensions.swift; sourceTree = "<group>"; };
 		EE812324B234E79565944187 /* Pods.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		FD9ABD1193ADB1678D918F96 /* Pods.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = Pods.release.xcconfig; path = "Pods/Target Support Files/Pods/Pods.release.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -127,6 +129,7 @@
 		A40D42431AFD68FE00050437 /* Helpers */ = {
 			isa = PBXGroup;
 			children = (
+				A4C512161AFE26F50016F965 /* Extensions.swift */,
 				A45AA0991AFC4302002F390B /* Constants.swift */,
 				A4003E4E1AFB973F008F310F /* TempratureConverter.swift */,
 			);
@@ -417,6 +420,7 @@
 				A40D423F1AFD1A7200050437 /* WeatherLocationManager.swift in Sources */,
 				A4003E401AFA3FC2008F310F /* SearchTableViewController.swift in Sources */,
 				A4003E471AFAD240008F310F /* FoundCityTableViewCell.swift in Sources */,
+				A4C512171AFE26F50016F965 /* Extensions.swift in Sources */,
 				A40D42411AFD218F00050437 /* City.swift in Sources */,
 				A47916801AFCE917006FB39D /* TempretureTableViewCell.swift in Sources */,
 			);

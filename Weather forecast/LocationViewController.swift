@@ -13,6 +13,8 @@ import MGSwipeTableCell
 
 class LocationViewController: UIViewController, UITableViewDataSource, UITableViewDelegate,CLLocationManagerDelegate {
 
+    // MARK: Properties
+    
     @IBOutlet weak var tableView: UITableView!
     
     private lazy var openWeatherAPIManager: OpenWeatheAPIManager = {        // lazy initialization
@@ -56,15 +58,7 @@ class LocationViewController: UIViewController, UITableViewDataSource, UITableVi
         super.viewWillDisappear(animated)
     }
 
-    /*
-    // MARK: - Navigation
-
-    // In a storyboard-based application, you will often want to do a little preparation before navigation
-    override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
-        // Get the new view controller using segue.destinationViewController.
-        // Pass the selected object to the new view controller.
-    }
-    */
+    // MARK: TableView delgate
     
     func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCellWithIdentifier(Constants.TempretureCelldentifire, forIndexPath: indexPath) as! UITableViewCell
@@ -74,13 +68,13 @@ class LocationViewController: UIViewController, UITableViewDataSource, UITableVi
             
             switch indexPath.section {
             case 0:
-                temperatureCell.tag = indexPath.row
-                
+                temperatureCell.currentImageView.alpha = 1.0
                 updateTempretureCellUI(temperatureCell, latitude: userPosition!.coordinate.latitude, longitude: userPosition!.coordinate.longitude, row: indexPath.row)
                 
                 temperatureCell.rightButtons = []
             case 1:
                 let city = cities[indexPath.row]
+                temperatureCell.currentImageView.alpha = 0.0
                 updateTempretureCellUI(temperatureCell, latitude: city.latitude.doubleValue, longitude: city.longitude.doubleValue, row: indexPath.row)
                 
                     
@@ -88,7 +82,7 @@ class LocationViewController: UIViewController, UITableViewDataSource, UITableVi
                     
                     let city = self.cities[deletedCell.tag]
                     self.cities.removeAtIndex(deletedCell.tag)
-                    println("TAAAG \(deletedCell.tag) ROOWW \(indexPath.row)")
+                    
                     // remove on background
                     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), { () -> Void in
                         city.MR_deleteEntity()
@@ -137,7 +131,7 @@ class LocationViewController: UIViewController, UITableViewDataSource, UITableVi
                         cell.weatherImageView.image = UIImage(named: "Sun_Big")
                     }
                     
-                    cell.weatherDescriptionLabel.text = weatherState.description
+                    cell.weatherDescriptionLabel.text = weatherState.description.firstCharacterUpperCase()
                 })
             }
         })
@@ -161,6 +155,23 @@ class LocationViewController: UIViewController, UITableViewDataSource, UITableVi
     
     func tableView(tableView: UITableView, canEditRowAtIndexPath indexPath: NSIndexPath) -> Bool {
         return indexPath.section == 1
+    }
+    
+    func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
+        
+        defaults.setBool(indexPath.section == 1, forKey: Constants.UsingSpecificPositionKey)
+        switch indexPath.section {
+        case 0:
+            self.dismissViewControllerAnimated(true, completion: nil)
+        case 1:
+            let city = cities[indexPath.row]
+            
+            defaults.setBool(true, forKey: Constants.UsingSpecificPositionKey)
+            defaults.setDouble(city.latitude.doubleValue, forKey: Constants.LatitudeKey)
+            defaults.setDouble(city.longitude.doubleValue, forKey: Constants.LongitudeKey)
+            dismissViewControllerAnimated(true, completion:nil)
+        default: break
+        }
     }
     
     

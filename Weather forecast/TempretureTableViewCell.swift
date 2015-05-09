@@ -19,4 +19,5 @@ class TempretureTableViewCell: MGSwipeTableCell {
     
     @IBOutlet weak var tempratureLabel: UILabel!
 
+    @IBOutlet weak var currentImageView: UIImageView!
 }

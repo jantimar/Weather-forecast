@@ -29,6 +29,8 @@ class SearchTableViewController: UITableViewController, UISearchBarDelegate {
         return lazilyOpenWeatherAPIManager
         }()
     
+    private var defaults = NSUserDefaults.standardUserDefaults()
+    
     private var searchBar :UISearchBar! {
         didSet {
             searchBar.placeholder = "City name"
@@ -111,9 +113,10 @@ class SearchTableViewController: UITableViewController, UISearchBarDelegate {
             var saveError: NSError?    // check if parsed data is dictionary
             NSManagedObjectContext.MR_defaultContext().MR_saveToPersistentStoreWithCompletion({ (succes, saveError) -> Void in
                 if saveError == nil {
-                    self.dismissViewControllerAnimated(true, completion: { () -> Void in
-                        //                            SAVE FLOAT VALUES
-                    })
+                    self.defaults.setBool(true, forKey: Constants.UsingSpecificPositionKey)
+                    self.defaults.setDouble(city.latitude.doubleValue, forKey: Constants.LatitudeKey)
+                    self.defaults.setDouble(city.longitude.doubleValue, forKey: Constants.LongitudeKey)
+                    self.dismissViewControllerAnimated(true, completion:nil)
                 }
             })
         }

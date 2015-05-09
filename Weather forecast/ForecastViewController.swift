@@ -46,13 +46,18 @@ class ForecastViewController: UITableViewController, CLLocationManagerDelegate {
     override func viewWillAppear(animated: Bool) {
         super.viewWillAppear(animated)
         
-        let useCurrentPositionForWeather = defaults.boolForKey(Constants.UsingUserPositionKey)
+        let useSpecificPositionForWeather = defaults.boolForKey(Constants.UsingSpecificPositionKey)
         
-        if useCurrentPositionForWeather
+        if useSpecificPositionForWeather
         {
-            // load weather forecast from saved coordinate
+            let latitude = defaults.doubleForKey(Constants.LatitudeKey)
+            let longitude = defaults.doubleForKey(Constants.LongitudeKey)
             
-        } else {
+            openWeatherAPIManager.asynchronlyGetForecast(6, longitude: longitude, latitude: latitude, loadedForecasts: { (forecasts) -> () in
+                
+                self.forecasts = forecasts
+            })
+        } else {// load weather forecast from saved coordinate
             locationManager.startUpdatingLocation()
         }
     }
@@ -124,7 +129,7 @@ class ForecastViewController: UITableViewController, CLLocationManagerDelegate {
                 temperatureCell.weatherImageView.image = UIImage(named: "Sun_Big")
             }
             
-            temperatureCell.weatherDescriptionLabel.text = dayForecast.description
+            temperatureCell.weatherDescriptionLabel.text = dayForecast.description.firstCharacterUpperCase()
             
             temperatureCell.titleLabel.text = dayNameFromToday(indexPath.row)
         }
