@@ -77,34 +77,19 @@ class TodayViewController: UIViewController {
     
     private func updateUI(weatherState: OpenWeatheAPIManager.WeatherState) {
         dispatch_async(dispatch_get_main_queue(), { () -> Void in
-            self.cityStateLabel.text = "\(weatherState.city), \(weatherState.counrty)"
+            self.cityStateLabel.setTextWithAnimation("\(weatherState.city), \(weatherState.counrty)")
             
             if weatherState.temprature != nil {
                 if let tempratureTypeRawValue = self.defaults.stringForKey(Constants.TempratureUnitKey) {
-                    switch SettignsTableViewController.TempratureType(rawValue: tempratureTypeRawValue)! {
-                    case .Kelvin: self.descriptionLabel.text = String(format:"%.1fK | %@", weatherState.temprature!,weatherState.description)
-                    case .Fahrenheit: self.descriptionLabel.text = String(format:"%.1f℉ | %@", self.tempratureConverter.convertTemperatures(weatherState.temprature!,  source:"Kelvin", target:"Fahrenheit"),weatherState.description)
-                    case .Celsius: fallthrough
-                    default: self.descriptionLabel.text = String(format:"%.1f℃ | %@", self.tempratureConverter.convertTemperatures(weatherState.temprature!,  source:"Kelvin", target:"Celsius"),weatherState.description)
-                    }
+                    self.descriptionLabel.setTextWithAnimation(String(format:"%@ | %@", weatherState.temprature!.tempratureInFormatFromKelvin(SettignsTableViewController.TempratureType(rawValue: tempratureTypeRawValue)!), weatherState.description))
                 } else {
-                    self.descriptionLabel.text = String(format:"%.1f℃ | %@", self.tempratureConverter.convertTemperatures(weatherState.temprature!,  source:"Kelvin", target:"Celsius"),weatherState.description)
+                    self.descriptionLabel.setTextWithAnimation(String(format:"%@ | %@", weatherState.temprature!.tempratureInFormatFromKelvin(.Celsius), weatherState.description))
                 }
             } else {
-                self.descriptionLabel.text = weatherState.description
+                self.descriptionLabel.setTextWithAnimation(weatherState.description)
             }
             
-            
-            let lowercaseDescription = weatherState.description.lowercaseString
-            if lowercaseDescription.rangeOfString("cloud") != nil {
-                self.weatherIconImageView.image = UIImage(named: "Cloudy_Big")
-            } else if lowercaseDescription.rangeOfString("light") != nil {
-                self.weatherIconImageView.image = UIImage(named: "Lightning_Big")
-            } else if lowercaseDescription.rangeOfString("wind") != nil {
-                self.weatherIconImageView.image = UIImage(named: "WInd_Big")
-            } else {
-                self.weatherIconImageView.image = UIImage(named: "Sun_Big")
-            }
+            self.weatherIconImageView.setImageWithAnimation(UIImage.weatherImage(weatherState.description))
             
             self.weatherStateView.updateWeathes(weatherState)
             
@@ -119,7 +104,6 @@ class TodayViewController: UIViewController {
             let textToShare = "Weather forecast \(descriptionLabel.text!) in \(cityStateLabel.text!)"
             
             let activityVC = UIActivityViewController(activityItems: [textToShare], applicationActivities: nil)
-            
             
             self.presentViewController(activityVC, animated: true, completion: nil)
         }

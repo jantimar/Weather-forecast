@@ -93,31 +93,18 @@ class ForecastViewController: UITableViewController {
             let dayForecast = forecasts.forecast[indexPath.row]
             
             // set temprature in format
-            if let tempratureTypeRawValue = self.defaults.stringForKey(Constants.TempratureUnitKey) {
-                switch SettignsTableViewController.TempratureType(rawValue: tempratureTypeRawValue)! {
-                case .Kelvin: temperatureCell.tempratureLabel.text = String(format:"%gK", dayForecast.tempratue)
-                case .Fahrenheit: temperatureCell.tempratureLabel.text = String(format:"%.1f℉", self.tempratureConverter.convertTemperatures( dayForecast.tempratue,  source:"Kelvin", target:"Fahrenheit"))
-                case .Celsius: fallthrough
-                default: temperatureCell.tempratureLabel.text = String(format:"%.0f°", self.tempratureConverter.convertTemperatures(dayForecast.tempratue,  source:"Kelvin", target:"Celsius"))
-                }
+            if let tempratureTypeRawValue = defaults.stringForKey(Constants.TempratureUnitKey) {
+                temperatureCell.tempratureLabel.setTextWithAnimation(String(format:"%@", dayForecast.tempratue.tempratureInFormatFromKelvin(SettignsTableViewController.TempratureType(rawValue: tempratureTypeRawValue)!)))
             } else {
-                temperatureCell.tempratureLabel.text = String(format:"%.0f°", self.tempratureConverter.convertTemperatures(dayForecast.tempratue,  source:"Kelvin", target:"Celsius"))
+                temperatureCell.tempratureLabel.setTextWithAnimation(String(format:"%@", dayForecast.tempratue.tempratureInFormatFromKelvin(.Celsius)))
             }
             
             // set image when description contain key word
-            let lowercaseDescription = dayForecast.description.lowercaseString
-            if lowercaseDescription.rangeOfString("cloud") != nil {
-                temperatureCell.weatherImageView.image = UIImage(named: "Cloudy_Big")
-            } else if lowercaseDescription.rangeOfString("light") != nil {
-                temperatureCell.weatherImageView.image = UIImage(named: "Lightning_Big")
-            } else if lowercaseDescription.rangeOfString("wind") != nil {
-                temperatureCell.weatherImageView.image = UIImage(named: "WInd_Big")
-            } else {
-                temperatureCell.weatherImageView.image = UIImage(named: "Sun_Big")
-            }
+            temperatureCell.weatherImageView.setImageWithAnimation(UIImage.weatherImage(dayForecast.description))
             
-            temperatureCell.weatherDescriptionLabel.text = dayForecast.description.firstCharacterUpperCase()
+            temperatureCell.weatherDescriptionLabel.setTextWithAnimation(dayForecast.description.firstCharacterUpperCase())
             
+            // dont animate is still same
             temperatureCell.titleLabel.text = dayNameFromToday(indexPath.row)
         }
         

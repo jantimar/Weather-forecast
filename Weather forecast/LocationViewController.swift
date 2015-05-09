@@ -74,7 +74,7 @@ class LocationViewController: UIViewController, UITableViewDataSource, UITableVi
                 updateTempretureCellUI(temperatureCell, latitude: city.latitude.doubleValue, longitude: city.longitude.doubleValue, rowIdentifire: indexPath.row + indexPath.section)
                 
                     
-                var button = MGSwipeButton(title: "", icon: UIImage(named: "DeleteIcon"), backgroundColor: UIColor(patternImage: UIImage(named: "Delete")!), callback: { (deletedCell) -> Bool in
+                var deleteButton = MGSwipeButton(title: "", icon: UIImage(named: "DeleteIcon"), backgroundColor: UIColor(patternImage: UIImage(named: "Delete")!), callback: { (deletedCell) -> Bool in
                     
                     let city = self.cities[indexPath.row]
                     self.cities.removeAtIndex(indexPath.row)
@@ -87,8 +87,8 @@ class LocationViewController: UIViewController, UITableViewDataSource, UITableVi
                     return true
                     })
                 // height of cell for square button
-                button.frame = CGRectMake(0.0, 0.0, rowHeight, rowHeight)
-                temperatureCell.rightButtons = [button]
+                deleteButton.frame = CGRectMake(0.0, 0.0, rowHeight, rowHeight)
+                temperatureCell.rightButtons = [deleteButton]
             default: break
             }
         }
@@ -101,33 +101,23 @@ class LocationViewController: UIViewController, UITableViewDataSource, UITableVi
         openWeatherAPIManager.asynchronlyGetWeatherForCoordinate(longitude, latitude: latitude, loadedWeather: { (weatherState) -> () in
             if cell.tag == rowIdentifire && weatherState.temprature != nil {
                 dispatch_async(dispatch_get_main_queue(), { () -> Void in
-                    cell.titleLabel.text = "\(weatherState.city)"
+                    cell.titleLabel.setTextWithAnimation("\(weatherState.city)")
                     
                     // set temprature in format
+                    if weatherState.temprature != nil {
                     if let tempratureTypeRawValue = self.defaults.stringForKey(Constants.TempratureUnitKey) {
-                        switch SettignsTableViewController.TempratureType(rawValue: tempratureTypeRawValue)! {
-                        case .Kelvin: cell.tempratureLabel.text = String(format:"%gK", weatherState.temprature!)
-                        case .Fahrenheit: cell.tempratureLabel.text = String(format:"%.1f℉", self.tempratureConverter.convertTemperatures( weatherState.temprature!,  source:"Kelvin", target:"Fahrenheit"))
-                        case .Celsius: fallthrough
-                        default: cell.tempratureLabel.text = String(format:"%.0f°", self.tempratureConverter.convertTemperatures(weatherState.temprature!,  source:"Kelvin", target:"Celsius"))
-                        }
+                        cell.tempratureLabel.setTextWithAnimation(String(format:"%@", weatherState.temprature!.tempratureInFormatFromKelvin(SettignsTableViewController.TempratureType(rawValue: tempratureTypeRawValue)!)))
                     } else {
-                        cell.tempratureLabel.text = String(format:"%.0f°", self.tempratureConverter.convertTemperatures(weatherState.temprature!,  source:"Kelvin", target:"Celsius"))
+                        cell.tempratureLabel.setTextWithAnimation(String(format:"%@", weatherState.temprature!.tempratureInFormatFromKelvin(.Celsius)))
+                    }
+                    } else {
+                        cell.tempratureLabel.setTextWithAnimation("-")
                     }
                     
                     // set image when description contain key word
-                    let lowercaseDescription = weatherState.description.lowercaseString
-                    if lowercaseDescription.rangeOfString("cloud") != nil {
-                        cell.weatherImageView.image = UIImage(named: "Cloudy_Big")
-                    } else if lowercaseDescription.rangeOfString("light") != nil {
-                        cell.weatherImageView.image = UIImage(named: "Lightning_Big")
-                    } else if lowercaseDescription.rangeOfString("wind") != nil {
-                        cell.weatherImageView.image = UIImage(named: "WInd_Big")
-                    } else {
-                        cell.weatherImageView.image = UIImage(named: "Sun_Big")
-                    }
+                    cell.weatherImageView.setImageWithAnimation(UIImage.weatherImage(weatherState.description))
                     
-                    cell.weatherDescriptionLabel.text = weatherState.description.firstCharacterUpperCase()
+                    cell.weatherDescriptionLabel.setTextWithAnimation(weatherState.description.firstCharacterUpperCase())
                 })
             }
         })

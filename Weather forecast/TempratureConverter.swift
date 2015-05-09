@@ -10,7 +10,7 @@ import Foundation
 
 class TempratureConverter : NSObject {
     
-func convertToCelsius(t:Float, source:String) -> Float? {
+static func convertToCelsius(t:Float, source:String) -> Float? {
     switch source {
     case "Kelvin": return t - 273.15
     case "Celsius": return t
@@ -24,7 +24,7 @@ func convertToCelsius(t:Float, source:String) -> Float? {
     }
 }
 
-func convertFromCelsius(t:Float, target:String) -> Float? {
+static func convertFromCelsius(t:Float, target:String) -> Float? {
     switch target {
     case "Kelvin":return t + 273.15
     case "Celsius": return t
@@ -38,7 +38,7 @@ func convertFromCelsius(t:Float, target:String) -> Float? {
     }
 }
 
-func convertTemperatures(t:Float, source:String, target:String) -> Float {
+static func convertTemperatures(t:Float, source:String, target:String) -> Float {
     return convertFromCelsius(convertToCelsius(t, source: source)!, target: target)!
 }
 
