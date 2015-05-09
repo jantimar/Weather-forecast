@@ -7,8 +7,9 @@
 //
 
 import UIKit
+import MGSwipeTableCell
 
-class TempretureTableViewCell: UITableViewCell {
+class TempretureTableViewCell: MGSwipeTableCell {
 
     @IBOutlet weak var weatherImageView: UIImageView!
     

@@ -9,6 +9,8 @@
 import UIKit
 import CoreLocation
 
+import MGSwipeTableCell
+
 class LocationViewController: UIViewController, UITableViewDataSource, UITableViewDelegate,CLLocationManagerDelegate {
 
     @IBOutlet weak var tableView: UITableView!
@@ -26,7 +28,7 @@ class LocationViewController: UIViewController, UITableViewDataSource, UITableVi
         return lazilyLocationManager
         }()
     
-    var cities = [City]() {
+    private var cities = [City]() {
         didSet {
             tableView.reloadData()
         }
@@ -36,7 +38,9 @@ class LocationViewController: UIViewController, UITableViewDataSource, UITableVi
     
     private var tempratureConverter = TempratureConverter()
 
-    var userPosition : CLLocation?
+    private var userPosition : CLLocation?
+    
+    private let rowHeight: CGFloat = 92.0
     
     override func viewWillAppear(animated: Bool) {
         super.viewWillAppear(animated)
@@ -73,9 +77,28 @@ class LocationViewController: UIViewController, UITableViewDataSource, UITableVi
                 temperatureCell.tag = indexPath.row
                 
                 updateTempretureCellUI(temperatureCell, latitude: userPosition!.coordinate.latitude, longitude: userPosition!.coordinate.longitude, row: indexPath.row)
+                
+                temperatureCell.rightButtons = []
             case 1:
                 let city = cities[indexPath.row]
                 updateTempretureCellUI(temperatureCell, latitude: city.latitude.doubleValue, longitude: city.longitude.doubleValue, row: indexPath.row)
+                
+                    
+                var button = MGSwipeButton(title: "", icon: UIImage(named: "DeleteIcon"), backgroundColor: UIColor(patternImage: UIImage(named: "Delete")!), callback: { (deletedCell) -> Bool in
+                    
+                    let city = self.cities[deletedCell.tag]
+                    self.cities.removeAtIndex(deletedCell.tag)
+                    println("TAAAG \(deletedCell.tag) ROOWW \(indexPath.row)")
+                    // remove on background
+                    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), { () -> Void in
+                        city.MR_deleteEntity()
+                        NSManagedObjectContext.MR_defaultContext().MR_saveToPersistentStoreAndWait()
+                    })
+                    return true
+                    })
+                // height of cell for square button
+                button.frame = CGRectMake(0.0, 0.0, rowHeight, rowHeight)
+                temperatureCell.rightButtons = [button]
             default: break
             }
         }
@@ -121,7 +144,7 @@ class LocationViewController: UIViewController, UITableViewDataSource, UITableVi
     }
     
     func tableView(tableView: UITableView, heightForRowAtIndexPath indexPath: NSIndexPath) -> CGFloat {
-        return 92.0
+        return rowHeight
     }
     
     func numberOfSectionsInTableView(tableView: UITableView) -> Int {
@@ -136,11 +159,17 @@ class LocationViewController: UIViewController, UITableViewDataSource, UITableVi
         }
     }
     
+    func tableView(tableView: UITableView, canEditRowAtIndexPath indexPath: NSIndexPath) -> Bool {
+        return indexPath.section == 1
+    }
+    
+    
     // MARK: Locations delegate
     
     func locationManager(manager: CLLocationManager!, didUpdateLocations locations: [AnyObject]!) {
         if let location = locations.last as? CLLocation {
             userPosition = location
+            tableView?.reloadData()
             locationManager.stopUpdatingLocation()  // load only first location
         }
     }

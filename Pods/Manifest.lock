@@ -3,13 +3,16 @@ PODS:
   - MagicalRecord (2.2):
     - MagicalRecord/Core (= 2.2)
   - MagicalRecord/Core (2.2)
+  - MGSwipeTableCell (1.4.3)
 
 DEPENDENCIES:
   - Alamofire (~> 1.2)
   - MagicalRecord
+  - MGSwipeTableCell (~> 1.4)
 
 SPEC CHECKSUMS:
   Alamofire: 1acfdf179aff68b41a48dff70c1ac7fa263e2bcb
   MagicalRecord: f8a56bb87ab6552f20c4bb8681a1958a197ea3cd
+  MGSwipeTableCell: cb9805df3cc5cad75ad43a5c1eb424be0316f0bf
 
 COCOAPODS: 0.37.0

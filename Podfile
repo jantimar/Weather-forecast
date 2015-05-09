@@ -4,3 +4,4 @@ use_frameworks!
 
 pod 'Alamofire', '~> 1.2'
 pod 'MagicalRecord'
+pod 'MGSwipeTableCell', '~> 1.4'

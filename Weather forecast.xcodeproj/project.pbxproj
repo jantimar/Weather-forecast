@@ -54,7 +54,7 @@
 		A4003E481AFAE575008F310F /* TodayViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TodayViewController.swift; sourceTree = "<group>"; };
 		A4003E4A1AFB78D1008F310F /* ForecastViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ForecastViewController.swift; sourceTree = "<group>"; };
 		A4003E4E1AFB973F008F310F /* TempratureConverter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TempratureConverter.swift; sourceTree = "<group>"; };
-		A40D42341AFD0C1700050437 /* SwiftMagiclaRecord-Bridge.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "SwiftMagiclaRecord-Bridge.h"; sourceTree = "<group>"; };
+		A40D42341AFD0C1700050437 /* Wether-forecast-Bridge.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Wether-forecast-Bridge.h"; sourceTree = "<group>"; };
 		A40D42361AFD0CFE00050437 /* WeartherForecastModel.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = WeartherForecastModel.xcdatamodel; sourceTree = "<group>"; };
 		A40D423E1AFD1A7200050437 /* WeatherLocationManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WeatherLocationManager.swift; sourceTree = "<group>"; };
 		A40D42401AFD218F00050437 /* City.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = City.swift; sourceTree = "<group>"; };
@@ -197,7 +197,7 @@
 				A40D42381AFD0D6100050437 /* Database */,
 				A46EBDD51AFA19D100FB717B /* Fonts */,
 				A46EBDB21AFA160A00FB717B /* AppDelegate.swift */,
-				A40D42341AFD0C1700050437 /* SwiftMagiclaRecord-Bridge.h */,
+				A40D42341AFD0C1700050437 /* Wether-forecast-Bridge.h */,
 			);
 			name = Model;
 			sourceTree = "<group>";
@@ -557,7 +557,7 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_OBJC_BRIDGING_HEADER = "Weather forecast/SwiftMagiclaRecord-Bridge.h";
+				SWIFT_OBJC_BRIDGING_HEADER = "Weather forecast/Wether-forecast-Bridge.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 			};
 			name = Debug;
@@ -575,7 +575,7 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_OBJC_BRIDGING_HEADER = "Weather forecast/SwiftMagiclaRecord-Bridge.h";
+				SWIFT_OBJC_BRIDGING_HEADER = "Weather forecast/Wether-forecast-Bridge.h";
 			};
 			name = Release;
 		};
