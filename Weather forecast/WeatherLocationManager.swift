@@ -11,7 +11,7 @@ import CoreLocation
 
 class WeatherLocationManager: NSObject, CLLocationManagerDelegate {
    
-     var userLocation: CLLocation?
+    private var userLocation: CLLocation?
     
     func userPosition() -> (Double?,Double?) {
         return userLocation != nil ? (userLocation!.coordinate.latitude,userLocation!.coordinate.longitude) : (nil,nil)
@@ -25,24 +25,28 @@ class WeatherLocationManager: NSObject, CLLocationManagerDelegate {
         return lazilyLocationManager
         }()
     
-    // pozriet singelton
-//    static var weatherLocationManage: WeatherLocationManager! {
-//        get {
-//            if weatherLocationManage == nil {
-//                WeatherLocationManager = WeatherLocationManager()
-//            }
-//            return WeatherLocationManager
-//        }
-//    }
-//    
-//    private override init() {
-//        super.init()
-//        locationManager.startUpdatingLocation()
-//    }
-//    
+    class var sharedInstance: WeatherLocationManager {
+        struct Static {
+            static var instance: WeatherLocationManager?
+            static var token: dispatch_once_t = 0
+        }
+        
+        dispatch_once(&Static.token) {
+            Static.instance = WeatherLocationManager()
+            Static.instance?.locationManager.startUpdatingLocation()
+        }
+        
+        return Static.instance!
+    }
+    
     func locationManager(manager: CLLocationManager!, didUpdateLocations locations: [AnyObject]!) {
         if let location = locations.last as? CLLocation {
             userLocation = location
+            
+            // stop uplouding location
+            locationManager.stopUpdatingLocation()
+            
+            NSNotificationCenter.defaultCenter().postNotificationName(Constants.UserCoordinateKey, object: nil, userInfo: [Constants.LongitudeKey:location.coordinate.longitude,Constants.LatitudeKey:location.coordinate.latitude])
         }
     }
     

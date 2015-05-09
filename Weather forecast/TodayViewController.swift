@@ -7,12 +7,12 @@
 //
 
 import UIKit
-import CoreLocation
 
-class TodayViewController: UIViewController, CLLocationManagerDelegate {
+class TodayViewController: UIViewController {
 
     // MARK: properties
     
+    @IBOutlet weak var loadingActivityIndicator: UIActivityIndicatorView!
     
     @IBOutlet weak var cityStateLabel: UILabel!
     
@@ -29,18 +29,12 @@ class TodayViewController: UIViewController, CLLocationManagerDelegate {
         return lazilyOpenWeatherAPIManager
         }()
     
-    private lazy var locationManager:CLLocationManager = {        // lazy initialization for location
-        let lazilyLocationManager = CLLocationManager()
-        lazilyLocationManager.delegate = self
-        lazilyLocationManager.desiredAccuracy = kCLLocationAccuracyBest
-        lazilyLocationManager.requestAlwaysAuthorization()
-        lazilyLocationManager.distanceFilter = 100 // update location after 100 m
-        return lazilyLocationManager
-        }()
-    
     private var defaults = NSUserDefaults.standardUserDefaults()
     
     private var tempratureConverter = TempratureConverter()
+    
+    
+    // MARK: Life cycle methods
     
     override func viewWillAppear(animated: Bool) {
         super.viewWillAppear(animated)
@@ -54,34 +48,36 @@ class TodayViewController: UIViewController, CLLocationManagerDelegate {
             let latitude = defaults.doubleForKey(Constants.LatitudeKey)
             let longitude = defaults.doubleForKey(Constants.LongitudeKey)
             
+            loadingActivityIndicator?.startAnimating()
             openWeatherAPIManager.asynchronlyGetWeatherForCoordinate( longitude, latitude: latitude, loadedWeather: updateUI)
             
         } else {
             currentImageView?.alpha = 1.0
-            locationManager.startUpdatingLocation()
+            
+            var (latitude,longitude) = WeatherLocationManager.sharedInstance.userPosition()
+            if latitude != nil && longitude != nil {
+                openWeatherAPIManager.asynchronlyGetWeatherForCoordinate( longitude!, latitude: latitude!, loadedWeather: updateUI)
+            }
+            else {
+                NSNotificationCenter.defaultCenter().addObserver(self, selector: "locationUpdated:", name: Constants.UserCoordinateKey, object: nil)
+            }
         }
     }
     
     override func viewWillDisappear(animated: Bool) {
         super.viewWillDisappear(animated)
         
-        locationManager.stopUpdatingLocation()
+        NSNotificationCenter.defaultCenter().removeObserver(self, name: Constants.UserCoordinateKey, object: nil)
     }
     
-    // MARK: Locations delegate
-    
-    func locationManager(manager: CLLocationManager!, didUpdateLocations locations: [AnyObject]!) {
-        if let location = locations.last as? CLLocation {
-            openWeatherAPIManager.asynchronlyGetWeatherForCoordinate( location.coordinate.longitude, latitude: location.coordinate.latitude, loadedWeather: updateUI)
-        }
+    func locationUpdated(notification: NSNotification) {
+        var (latitude,longitude) = WeatherLocationManager.sharedInstance.userPosition()
+        openWeatherAPIManager.asynchronlyGetWeatherForCoordinate( longitude!, latitude: latitude!, loadedWeather: updateUI)
     }
-    
     
     private func updateUI(weatherState: OpenWeatheAPIManager.WeatherState) {
         dispatch_async(dispatch_get_main_queue(), { () -> Void in
             self.cityStateLabel.text = "\(weatherState.city), \(weatherState.counrty)"
-            
-            
             
             if weatherState.temprature != nil {
                 if let tempratureTypeRawValue = self.defaults.stringForKey(Constants.TempratureUnitKey) {
@@ -111,6 +107,8 @@ class TodayViewController: UIViewController, CLLocationManagerDelegate {
             }
             
             self.weatherStateView.updateWeathes(weatherState)
+            
+            self.loadingActivityIndicator?.stopAnimating()
         })
     }
     

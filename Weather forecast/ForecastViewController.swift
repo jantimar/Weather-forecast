@@ -7,9 +7,8 @@
 //
 
 import UIKit
-import CoreLocation
 
-class ForecastViewController: UITableViewController, CLLocationManagerDelegate {
+class ForecastViewController: UITableViewController {
     
     
     // MARK: Properties
@@ -20,14 +19,6 @@ class ForecastViewController: UITableViewController, CLLocationManagerDelegate {
         }()
     
     private var defaults = NSUserDefaults.standardUserDefaults()
-    
-    private lazy var locationManager:CLLocationManager = {        // lazy initialization for location
-        let lazilyLocationManager = CLLocationManager()
-        lazilyLocationManager.delegate = self
-        lazilyLocationManager.desiredAccuracy = kCLLocationAccuracyBest
-        lazilyLocationManager.requestAlwaysAuthorization()
-        return lazilyLocationManager
-        }()
     
     private var forecasts = OpenWeatheAPIManager.Forecasts() {
         didSet {
@@ -49,7 +40,7 @@ class ForecastViewController: UITableViewController, CLLocationManagerDelegate {
         let useSpecificPositionForWeather = defaults.boolForKey(Constants.UsingSpecificPositionKey)
         
         if useSpecificPositionForWeather
-        {
+        { // load weather forecast from saved coordinate
             let latitude = defaults.doubleForKey(Constants.LatitudeKey)
             let longitude = defaults.doubleForKey(Constants.LongitudeKey)
             
@@ -57,15 +48,23 @@ class ForecastViewController: UITableViewController, CLLocationManagerDelegate {
                 
                 self.forecasts = forecasts
             })
-        } else {// load weather forecast from saved coordinate
-            locationManager.startUpdatingLocation()
+        } else {
+            var (latitude,longitude) = WeatherLocationManager.sharedInstance.userPosition()
+            if latitude != nil && longitude != nil {
+                openWeatherAPIManager.asynchronlyGetForecast(6, longitude: longitude!, latitude: latitude!, loadedForecasts: { (forecasts) -> () in
+                    self.forecasts = forecasts
+                })
+            }
+            else {
+                NSNotificationCenter.defaultCenter().addObserver(self, selector: "locationUpdated:", name: Constants.UserCoordinateKey, object: nil)
+            }
         }
     }
-    
+
     override func viewWillDisappear(animated: Bool) {
         super.viewWillDisappear(animated)
         
-        locationManager.stopUpdatingLocation()
+        NSNotificationCenter.defaultCenter().removeObserver(self, name: Constants.UserCoordinateKey, object: nil)
     }
     
     override func viewDidLoad() {
@@ -78,18 +77,6 @@ class ForecastViewController: UITableViewController, CLLocationManagerDelegate {
         var swipeLeft = UISwipeGestureRecognizer(target: self, action: "swipeGesture:")
         swipeLeft.direction = .Left
         self.tableView?.addGestureRecognizer(swipeLeft)
-    }
-    
-    // MARK: Locations delegate
-    
-    func locationManager(manager: CLLocationManager!, didUpdateLocations locations: [AnyObject]!) {
-        if let location = locations.last as? CLLocation {
-            openWeatherAPIManager.asynchronlyGetForecast(6, longitude: location.coordinate.longitude, latitude: location.coordinate.latitude, loadedForecasts: { (forecasts) -> () in
-                
-                self.forecasts = forecasts
-                manager.stopUpdatingLocation()  // only one result is suitable
-            })
-        }
     }
     
     // MARK: - Table view data source
@@ -142,6 +129,13 @@ class ForecastViewController: UITableViewController, CLLocationManagerDelegate {
     }
     
     // MAKR: Help methods
+    
+    func locationUpdated(notification: NSNotification) {
+        var (latitude,longitude) = WeatherLocationManager.sharedInstance.userPosition()
+        openWeatherAPIManager.asynchronlyGetForecast(6, longitude: longitude!, latitude: latitude!, loadedForecasts: { (forecasts) -> () in
+            self.forecasts = forecasts
+        })
+    }
     
     private func dayNameFromToday(daysFromToday: Int) -> String {
         let dateFormatter = NSDateFormatter()

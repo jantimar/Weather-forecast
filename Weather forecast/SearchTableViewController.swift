@@ -45,6 +45,7 @@ class SearchTableViewController: UITableViewController, UISearchBarDelegate {
             searchBar.delegate = self
             searchBar.setImage(UIImage(named: "Search"), forSearchBarIcon: .Search, state: .Normal)
             searchBar.setImage(UIImage(named: "Close"), forSearchBarIcon: .Clear, state: .Normal)
+            searchBar.setSearchFieldBackgroundImage(UIImage(named: "Input"), forState: .Normal)
             
             // set text color
             if let textFieldInsideSearchBar = searchBar.valueForKey("searchField") as? UITextField {

@@ -7,11 +7,10 @@
 //
 
 import UIKit
-import CoreLocation
 
 import MGSwipeTableCell
 
-class LocationViewController: UIViewController, UITableViewDataSource, UITableViewDelegate,CLLocationManagerDelegate {
+class LocationViewController: UIViewController, UITableViewDataSource, UITableViewDelegate {
 
     // MARK: Properties
     
@@ -20,14 +19,6 @@ class LocationViewController: UIViewController, UITableViewDataSource, UITableVi
     private lazy var openWeatherAPIManager: OpenWeatheAPIManager = {        // lazy initialization
         let lazilyOpenWeatherAPIManager = OpenWeatheAPIManager()
         return lazilyOpenWeatherAPIManager
-        }()
-    
-    private lazy var locationManager:CLLocationManager = {        // lazy initialization for location
-        let lazilyLocationManager = CLLocationManager()
-        lazilyLocationManager.delegate = self
-        lazilyLocationManager.desiredAccuracy = kCLLocationAccuracyBest
-        lazilyLocationManager.requestAlwaysAuthorization()
-        return lazilyLocationManager
         }()
     
     private var cities = [City]() {
@@ -40,9 +31,9 @@ class LocationViewController: UIViewController, UITableViewDataSource, UITableVi
     
     private var tempratureConverter = TempratureConverter()
 
-    private var userPosition : CLLocation?
-    
     private let rowHeight: CGFloat = 92.0
+    
+    // MARK: Life cycle methods
     
     override func viewWillAppear(animated: Bool) {
         super.viewWillAppear(animated)
@@ -50,15 +41,18 @@ class LocationViewController: UIViewController, UITableViewDataSource, UITableVi
         // load city from databas
         if let findedCities = City.MR_findAll() as? [City] {
             cities = findedCities
-            locationManager.startUpdatingLocation()
         }
+        
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: "locationUpdated:", name: Constants.UserCoordinateKey, object: nil)
     }
     
     override func viewWillDisappear(animated: Bool) {
         super.viewWillDisappear(animated)
+        
+        NSNotificationCenter.defaultCenter().removeObserver(self, name: Constants.UserCoordinateKey, object: nil)
     }
-
-    // MARK: TableView delgate
+    
+    // MARK: - Table view data source
     
     func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCellWithIdentifier(Constants.TempretureCelldentifire, forIndexPath: indexPath) as! UITableViewCell
@@ -69,19 +63,21 @@ class LocationViewController: UIViewController, UITableViewDataSource, UITableVi
             switch indexPath.section {
             case 0:
                 temperatureCell.currentImageView.alpha = 1.0
-                updateTempretureCellUI(temperatureCell, latitude: userPosition!.coordinate.latitude, longitude: userPosition!.coordinate.longitude, row: indexPath.row)
+                
+                var (latitude,longitude) = WeatherLocationManager.sharedInstance.userPosition()
+                updateTempretureCellUI(temperatureCell, latitude: latitude!, longitude: longitude!, rowIdentifire: indexPath.row)
                 
                 temperatureCell.rightButtons = []
             case 1:
                 let city = cities[indexPath.row]
                 temperatureCell.currentImageView.alpha = 0.0
-                updateTempretureCellUI(temperatureCell, latitude: city.latitude.doubleValue, longitude: city.longitude.doubleValue, row: indexPath.row)
+                updateTempretureCellUI(temperatureCell, latitude: city.latitude.doubleValue, longitude: city.longitude.doubleValue, rowIdentifire: indexPath.row + indexPath.section)
                 
                     
                 var button = MGSwipeButton(title: "", icon: UIImage(named: "DeleteIcon"), backgroundColor: UIColor(patternImage: UIImage(named: "Delete")!), callback: { (deletedCell) -> Bool in
                     
-                    let city = self.cities[deletedCell.tag]
-                    self.cities.removeAtIndex(deletedCell.tag)
+                    let city = self.cities[indexPath.row]
+                    self.cities.removeAtIndex(indexPath.row)
                     
                     // remove on background
                     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), { () -> Void in
@@ -100,10 +96,10 @@ class LocationViewController: UIViewController, UITableViewDataSource, UITableVi
         return cell
     }
     
-    private func updateTempretureCellUI(cell: TempretureTableViewCell, latitude: Double, longitude: Double,row: Int) {
-        cell.tag = row
+    private func updateTempretureCellUI(cell: TempretureTableViewCell, latitude: Double, longitude: Double,rowIdentifire: Int) {
+        cell.tag = rowIdentifire
         openWeatherAPIManager.asynchronlyGetWeatherForCoordinate(longitude, latitude: latitude, loadedWeather: { (weatherState) -> () in
-            if cell.tag == row && weatherState.temprature != nil {
+            if cell.tag == rowIdentifire && weatherState.temprature != nil {
                 dispatch_async(dispatch_get_main_queue(), { () -> Void in
                     cell.titleLabel.text = "\(weatherState.city)"
                     
@@ -147,7 +143,9 @@ class LocationViewController: UIViewController, UITableViewDataSource, UITableVi
     
     func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         switch section {
-        case 0: return userPosition != nil ? 1 : 0
+        case 0:
+            var (latitude,longitude) = WeatherLocationManager.sharedInstance.userPosition()
+            return latitude != nil && longitude != nil ? 1 : 0
         case 1: return cities.count
         default: return 0
         }
@@ -177,12 +175,10 @@ class LocationViewController: UIViewController, UITableViewDataSource, UITableVi
     
     // MARK: Locations delegate
     
-    func locationManager(manager: CLLocationManager!, didUpdateLocations locations: [AnyObject]!) {
-        if let location = locations.last as? CLLocation {
-            userPosition = location
-            tableView?.reloadData()
-            locationManager.stopUpdatingLocation()  // load only first location
-        }
+    func locationUpdated(notification: NSNotification) {
+        dispatch_async(dispatch_get_main_queue(), { () -> Void in
+            self.tableView.reloadData()
+        })
     }
     
     // MARK: Buttons press

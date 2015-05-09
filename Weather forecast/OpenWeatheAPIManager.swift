@@ -59,11 +59,13 @@ class OpenWeatheAPIManager: NSObject {
     
     
     func asynchronlySearchCityLike(named name: String, foundCities: (name: String, [FoundCity]) -> ()) {
-        
+        UIApplication.sharedApplication().networkActivityIndicatorVisible = true
         dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0)) {
             //api.openweathermap.org/data/2.5/find?q=York&type=like
             Alamofire.request(.GET, "http://api.openweathermap.org/data/2.5/find", parameters: ["q": name, "type": "like"])
                 .response { (request, response, data, error) in
+                    
+                    UIApplication.sharedApplication().networkActivityIndicatorVisible = false
                     
                     if let responseData = data as? NSData {
                         var parseError: NSError?    // check if parsed data is dictionary
@@ -100,10 +102,13 @@ class OpenWeatheAPIManager: NSObject {
     }
     
     func asynchronlyGetForecast(forDaysForecast: Int, longitude: Double, latitude: Double, loadedForecasts:(Forecasts) -> ()) {
+        UIApplication.sharedApplication().networkActivityIndicatorVisible = true
         dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0)) {
             //api.openweathermap.org/data/2.5/forecast/daily?lat=35&lon=139&cnt=6&mode=json
             Alamofire.request(.GET, "http://api.openweathermap.org/data/2.5/forecast/daily", parameters: ["lat": latitude, "lon": longitude, "cnt": forDaysForecast, "mode": "json"])
                 .response { (request, response, data, error) in
+                    
+                    UIApplication.sharedApplication().networkActivityIndicatorVisible = false
                     
                     if let responseData = data as? NSData {
                         var parseError: NSError?    // check if parsed data is dictionary
@@ -147,10 +152,13 @@ class OpenWeatheAPIManager: NSObject {
     
     
     func asynchronlyGetWeatherForCoordinate(longitude: Double,latitude: Double,loadedWeather: (WeatherState) -> ()) {
+        UIApplication.sharedApplication().networkActivityIndicatorVisible = true
         dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0)) {
             //api.openweathermap.org/data/2.5/weather?lat=35&lon=139
             Alamofire.request(.GET, "http://api.openweathermap.org/data/2.5/weather", parameters: ["lat": latitude, "lon": longitude])
                 .response { (request, response, data, error) in
+                    
+                    UIApplication.sharedApplication().networkActivityIndicatorVisible = false
                     
                     if let responseData = data as? NSData {
                         var parseError: NSError?    // check if parsed data is dictionary

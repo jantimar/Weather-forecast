@@ -225,6 +225,10 @@
                                         <rect key="frame" x="200" y="188" width="200" height="62"/>
                                         <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                                     </view>
+                                    <activityIndicatorView opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" hidesWhenStopped="YES" animating="YES" style="whiteLarge" translatesAutoresizingMaskIntoConstraints="NO" id="P1R-8b-suf">
+                                        <rect key="frame" x="282" y="200" width="37" height="37"/>
+                                        <color key="color" red="0.1843137255" green="0.56862745100000001" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                    </activityIndicatorView>
                                 </subviews>
                                 <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                                 <constraints>
@@ -251,6 +255,7 @@
                                     <constraint firstAttribute="trailing" secondItem="XHd-AR-27P" secondAttribute="trailing" id="RGb-IO-cHR"/>
                                     <constraint firstItem="Ne4-dC-NDG" firstAttribute="top" secondItem="QTA-75-wXH" secondAttribute="bottom" id="TwQ-oY-tWh"/>
                                     <constraint firstAttribute="trailing" secondItem="otd-Ug-QS1" secondAttribute="trailing" id="Vwl-Q7-vRt"/>
+                                    <constraint firstItem="Ne4-dC-NDG" firstAttribute="centerY" secondItem="P1R-8b-suf" secondAttribute="centerY" id="XBX-dQ-IVU"/>
                                     <constraint firstItem="Hae-Yh-gyG" firstAttribute="width" secondItem="av7-JR-GaE" secondAttribute="width" id="XTD-Ic-8Ya"/>
                                     <constraint firstItem="QTA-75-wXH" firstAttribute="top" secondItem="dDX-kl-eC9" secondAttribute="bottom" id="ZDK-kr-d2k"/>
                                     <constraint firstItem="uhJ-Mx-5Sy" firstAttribute="centerY" secondItem="zPv-IY-4Dh" secondAttribute="centerY" id="ZrG-ex-7qs"/>
@@ -261,6 +266,7 @@
                                     <constraint firstItem="av7-JR-GaE" firstAttribute="top" secondItem="0fY-C7-mb5" secondAttribute="top" id="gA0-y2-IqD"/>
                                     <constraint firstItem="zPv-IY-4Dh" firstAttribute="leading" secondItem="dDX-kl-eC9" secondAttribute="trailing" id="hgx-Kw-GNz"/>
                                     <constraint firstItem="otd-Ug-QS1" firstAttribute="top" secondItem="sRh-Gp-AsR" secondAttribute="bottom" id="md2-HS-2aA"/>
+                                    <constraint firstItem="Ne4-dC-NDG" firstAttribute="centerX" secondItem="P1R-8b-suf" secondAttribute="centerX" id="p1r-0a-NUE"/>
                                     <constraint firstItem="Hae-Yh-gyG" firstAttribute="width" secondItem="zPv-IY-4Dh" secondAttribute="width" id="pil-Kw-Nqe"/>
                                     <constraint firstItem="Hae-Yh-gyG" firstAttribute="height" secondItem="QTA-75-wXH" secondAttribute="height" id="rII-AU-92Z"/>
                                     <constraint firstItem="XHd-AR-27P" firstAttribute="top" secondItem="0fY-C7-mb5" secondAttribute="top" id="su0-Ep-SDL"/>
@@ -342,6 +348,7 @@
                         <outlet property="cityStateLabel" destination="brW-P3-BCK" id="EsM-Zt-lzZ"/>
                         <outlet property="currentImageView" destination="bfF-4Y-0oc" id="Sii-nA-7HW"/>
                         <outlet property="descriptionLabel" destination="U6d-t5-x5t" id="3zz-lM-iuz"/>
+                        <outlet property="loadingActivityIndicator" destination="P1R-8b-suf" id="Gg2-Uh-07a"/>
                         <outlet property="weatherIconImageView" destination="S5b-zn-dMq" id="NPh-hZ-ZcM"/>
                         <outlet property="weatherStateView" destination="0fY-C7-mb5" id="urr-Wv-EMe"/>
                     </connections>

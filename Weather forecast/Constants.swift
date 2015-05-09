@@ -16,4 +16,5 @@ struct Constants {
     static let UsingSpecificPositionKey = "sk.jantimar.Weather-forecast.UsingSpecificPositionKey"
     static let LatitudeKey = "sk.jantimar.Weather-forecast.LatitudenKey"
     static let LongitudeKey = "sk.jantimar.Weather-forecast.LongitudeKey"
+    static let UserCoordinateKey = "sk.jantimar.Weather-forecast.UserCoordinateKey"
 }
