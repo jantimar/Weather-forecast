@@ -34,14 +34,8 @@ class SearchTableViewController: UITableViewController, UISearchBarDelegate {
     private var searchBar :UISearchBar! {
         didSet {
             searchBar.placeholder = "City name"
-            
-//            searchBar.layer.borderColor = UIColor(red: 37.0/255.0, green: 142.0/255.0, blue: 1.0, alpha: 1.0).CGColor
-//            searchBar.layer.borderWidth = 1.0
-//            searchBar.layer.cornerRadius = 5.0
-            
             searchBar.setBackgroundImage(UIImage(named: "Input"), forBarPosition: .Any, barMetrics: .Default)
-
-            //searchBar.tintColor = UIColor(red: 37.0/255.0, green: 142.0/255.0, blue: 1.0, alpha: 1.0)
+            
             searchBar.delegate = self
             searchBar.setImage(UIImage(named: "Search"), forSearchBarIcon: .Search, state: .Normal)
             searchBar.setImage(UIImage(named: "Close"), forSearchBarIcon: .Clear, state: .Normal)
@@ -50,8 +44,10 @@ class SearchTableViewController: UITableViewController, UISearchBarDelegate {
             // set text color
             if let textFieldInsideSearchBar = searchBar.valueForKey("searchField") as? UITextField {
                 textFieldInsideSearchBar.textColor = UIColor(red: 37.0/255.0, green: 142.0/255.0, blue: 1.0, alpha: 1.0)
-                
-                println("Nastavit font search baru a zmenit jeho velkost")
+                textFieldInsideSearchBar.font = UIFont(name: "ProximaNova-Semibold", size: 16.0)
+                var oldBounds = textFieldInsideSearchBar.bounds
+                oldBounds.offset(dx: oldBounds.minX + 5.0, dy: oldBounds.midY)
+                textFieldInsideSearchBar.bounds = oldBounds
             }
             
         }

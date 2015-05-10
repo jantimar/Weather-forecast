@@ -11,6 +11,9 @@ import CoreLocation
 
 class WeatherLocationManager: NSObject, CLLocationManagerDelegate {
    
+    
+    // MARK: Properties
+    
     private var userLocation: CLLocation?
     
     func userPosition() -> (Double?,Double?) {
@@ -25,6 +28,7 @@ class WeatherLocationManager: NSObject, CLLocationManagerDelegate {
         return lazilyLocationManager
         }()
     
+    // Singelton
     class var sharedInstance: WeatherLocationManager {
         struct Static {
             static var instance: WeatherLocationManager?
@@ -37,6 +41,20 @@ class WeatherLocationManager: NSObject, CLLocationManagerDelegate {
         }
         
         return Static.instance!
+    }
+    
+    // Mark: Location managar delegate
+    
+    func locationManager(manager: CLLocationManager!, didChangeAuthorizationStatus status: CLAuthorizationStatus) {
+        switch status {
+        case .Denied:
+            // for stop waiting for position
+            NSNotificationCenter.defaultCenter().postNotificationName(Constants.UserCoordinateKey, object: nil, userInfo:nil)
+            break
+        default:
+            break
+            
+        }
     }
     
     func locationManager(manager: CLLocationManager!, didUpdateLocations locations: [AnyObject]!) {

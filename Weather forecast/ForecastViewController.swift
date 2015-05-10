@@ -24,7 +24,7 @@ class ForecastViewController: UITableViewController {
         didSet {
             dispatch_async(dispatch_get_main_queue(), { () -> Void in
                 self.tableView?.reloadData()
-                self.title = self.forecasts.city
+                self.navigationItem.title = self.forecasts.city
             })
         }
     }
@@ -119,9 +119,13 @@ class ForecastViewController: UITableViewController {
     
     func locationUpdated(notification: NSNotification) {
         var (latitude,longitude) = WeatherLocationManager.sharedInstance.userPosition()
-        openWeatherAPIManager.asynchronlyGetForecast(6, longitude: longitude!, latitude: latitude!, loadedForecasts: { (forecasts) -> () in
+        if latitude != nil && longitude != nil {
+            openWeatherAPIManager.asynchronlyGetForecast(6, longitude: longitude!, latitude: latitude!, loadedForecasts: { (forecasts) -> () in
             self.forecasts = forecasts
-        })
+            })
+        } else {
+            UIAlertView(title: "Error", message: "User position is denied", delegate: nil, cancelButtonTitle: "Cancle").show()
+        }
     }
     
     private func dayNameFromToday(daysFromToday: Int) -> String {

@@ -48,6 +48,8 @@ class TodayViewController: UIViewController {
             let latitude = defaults.doubleForKey(Constants.LatitudeKey)
             let longitude = defaults.doubleForKey(Constants.LongitudeKey)
             
+            cityStateLabel.text = ""
+            descriptionLabel.text = ""
             loadingActivityIndicator?.startAnimating()
             openWeatherAPIManager.asynchronlyGetWeatherForCoordinate( longitude, latitude: latitude, loadedWeather: updateUI)
             
@@ -72,7 +74,12 @@ class TodayViewController: UIViewController {
     
     func locationUpdated(notification: NSNotification) {
         var (latitude,longitude) = WeatherLocationManager.sharedInstance.userPosition()
-        openWeatherAPIManager.asynchronlyGetWeatherForCoordinate( longitude!, latitude: latitude!, loadedWeather: updateUI)
+        if longitude != nil && latitude != nil {
+            openWeatherAPIManager.asynchronlyGetWeatherForCoordinate( longitude!, latitude: latitude!, loadedWeather: updateUI)
+        } else {
+            UIAlertView(title: "Error", message: "User position is denied", delegate: nil, cancelButtonTitle: "Cancle").show()
+            loadingActivityIndicator.stopAnimating()
+        }
     }
     
     private func updateUI(weatherState: OpenWeatheAPIManager.WeatherState) {
