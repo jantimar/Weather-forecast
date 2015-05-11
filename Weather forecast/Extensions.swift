@@ -12,7 +12,7 @@ extension String {
     func firstCharacterUpperCase() -> String {
         let lowercaseString = self.lowercaseString
         
-        return lowercaseString.stringByReplacingCharactersInRange(lowercaseString.startIndex...lowercaseString.startIndex, withString: String(lowercaseString[lowercaseString.startIndex]).uppercaseString)
+        return count(self) > 1 ? lowercaseString.stringByReplacingCharactersInRange(lowercaseString.startIndex...lowercaseString.startIndex, withString: String(lowercaseString[lowercaseString.startIndex]).uppercaseString) : ""
     }
 }
 

@@ -12,11 +12,33 @@ import Alamofire
 
 class OpenWeatheAPIManager: NSObject {
     
+    struct WeatherAPIEror {
+        var description: String
+        var error: NSError
+    }
+    
+    
     struct FoundCity {
         var name: String
         var counrty: String
         var latitude: Double
         var longitude: Double
+        var error: WeatherAPIEror?
+        
+        init(error: WeatherAPIEror) {
+            self.error = error
+            self.longitude = 0.0
+            self.latitude = 0.0
+            self.counrty = ""
+            self.name = ""
+        }
+        
+        init(name: String, counrty: String, latitude: Double, longitude: Double) {
+            self.longitude = longitude
+            self.latitude = latitude
+            self.counrty = counrty
+            self.name = name
+        }
     }
     
     struct WeatherState {
@@ -30,6 +52,7 @@ class OpenWeatheAPIManager: NSObject {
         var windDeggree: Float?
         var rain: Float?
         var clouds: Float?
+        var error: WeatherAPIEror?
         
         init() {
             city = ""
@@ -42,7 +65,7 @@ class OpenWeatheAPIManager: NSObject {
         var city: String
         var latitude: Double
         var longitude: Double
-        var forecast: [Forecast]
+        var forecast: [Forecast]?
         
         init() {
             city = ""
@@ -55,6 +78,18 @@ class OpenWeatheAPIManager: NSObject {
     struct Forecast {
         var tempratue: Float
         var description: String
+        var error: WeatherAPIEror?
+        
+        init(error: WeatherAPIEror) {
+            self.error = error
+            self.tempratue = 0.0
+            self.description = ""
+        }
+        
+        init(tempratue: Float, description: String) {
+            self.tempratue = tempratue
+            self.description = description
+        }
     }
     
     
@@ -66,6 +101,10 @@ class OpenWeatheAPIManager: NSObject {
                 .response { (request, response, data, error) in
                     
                     UIApplication.sharedApplication().networkActivityIndicatorVisible = false
+                    
+                    if error != nil {
+                        foundCities(name: name, [FoundCity(error: WeatherAPIEror(description: "Cannot connect to Internet", error: error!))])
+                    } else {
                     
                     if let responseData = data as? NSData {
                         var parseError: NSError?    // check if parsed data is dictionary
@@ -86,7 +125,7 @@ class OpenWeatheAPIManager: NSObject {
                                                         if let latitude = coordination["lat"] {
                                                             if let longitude = coordination["lon"]{
                                                                 suitableCities.append(FoundCity(name: cityName, counrty: country, latitude: latitude, longitude: longitude))
-                                                        }
+                                                            }
                                                         }
                                                     }
                                                 }
@@ -95,6 +134,7 @@ class OpenWeatheAPIManager: NSObject {
                                     }
                                     foundCities(name: name, suitableCities)
                                 }
+                        }
                         }
                     }
             }
@@ -110,39 +150,52 @@ class OpenWeatheAPIManager: NSObject {
                     
                     UIApplication.sharedApplication().networkActivityIndicatorVisible = false
                     
-                    if let responseData = data as? NSData {
-                        var parseError: NSError?    // check if parsed data is dictionary
-                        if let parsedJsonInDictionary = NSJSONSerialization.JSONObjectWithData(responseData,
-                            options: NSJSONReadingOptions.AllowFragments,
-                            error:&parseError) as? [String: AnyObject] {
-                                
-                                var forecasts = Forecasts()
-                                forecasts.latitude = latitude
-                                forecasts.longitude = longitude
-                                
-                                if let city = parsedJsonInDictionary["city"] as? [String:AnyObject] {
-                                    if let cityName = city["name"] as? String {
-                                        forecasts.city = cityName
+                    
+                    var forecasts = Forecasts()
+                    forecasts.latitude = latitude
+                    forecasts.longitude = longitude
+                    
+                    if error != nil {
+                        // TODO: Load data from database
+                        
+                        for var day = 0; day < forDaysForecast; day++ {
+                            forecasts.forecast?.append(Forecast(error: WeatherAPIEror(description: "Cannot connect to Internet", error: error!)))
+                        }
+                        
+                        loadedForecasts(forecasts)
+                        
+                    } else {
+                        
+                        if let responseData = data as? NSData {
+                            var parseError: NSError?    // check if parsed data is dictionary
+                            if let parsedJsonInDictionary = NSJSONSerialization.JSONObjectWithData(responseData,
+                                options: NSJSONReadingOptions.AllowFragments,
+                                error:&parseError) as? [String: AnyObject] {
+                                    
+                                    if let city = parsedJsonInDictionary["city"] as? [String:AnyObject] {
+                                        if let cityName = city["name"] as? String {
+                                            forecasts.city = cityName
+                                        }
                                     }
-                                }
-                                
-                                if let list = parsedJsonInDictionary["list"] as? [[String:AnyObject]]{
-                                    for dayForecast in list {
-                                        if let temprature = dayForecast["temp"] as? [String:Float] {
-                                            if let dayTeplature = temprature["day"] {
-                                                if let weathers = dayForecast["weather"] as? [AnyObject] {
-                                                    if let firstWeather = weathers.first as? [String:AnyObject] {
-                                                        if let description = firstWeather["description"] as? String {
-                                                            forecasts.forecast.append(Forecast(tempratue: dayTeplature, description: description))
+                                    
+                                    if let list = parsedJsonInDictionary["list"] as? [[String:AnyObject]]{
+                                        for dayForecast in list {
+                                            if let temprature = dayForecast["temp"] as? [String:Float] {
+                                                if let dayTeplature = temprature["day"] {
+                                                    if let weathers = dayForecast["weather"] as? [AnyObject] {
+                                                        if let firstWeather = weathers.first as? [String:AnyObject] {
+                                                            if let description = firstWeather["description"] as? String {
+                                                                forecasts.forecast!.append(Forecast(tempratue: dayTeplature, description: description))
+                                                            }
                                                         }
                                                     }
                                                 }
                                             }
                                         }
                                     }
-                                }
-                                
-                                loadedForecasts(forecasts)
+                                    
+                                    loadedForecasts(forecasts)
+                            }
                         }
                     }
             }
@@ -160,47 +213,56 @@ class OpenWeatheAPIManager: NSObject {
                     
                     UIApplication.sharedApplication().networkActivityIndicatorVisible = false
                     
-                    if let responseData = data as? NSData {
-                        var parseError: NSError?    // check if parsed data is dictionary
-                        if let parsedJsonInDictionary = NSJSONSerialization.JSONObjectWithData(responseData,
-                            options: NSJSONReadingOptions.AllowFragments,
-                            error:&parseError) as? [String: AnyObject] {
-                                
-                                var weatherState = WeatherState()
-                                
-                                
-                                if let cityName = parsedJsonInDictionary["name"] as? String {
-                                    weatherState.city = cityName
-                                }
-                                if let countrySys = parsedJsonInDictionary["sys"] as? [String:AnyObject]  {
-                                    if let country = countrySys["country"] as? String {
-                                        weatherState.counrty = country
+                    var weatherState = WeatherState()
+                    
+                    if error != nil {
+                        //TODO: Load data from database
+                        
+                        weatherState.error = WeatherAPIEror(description: "Cannot connect to Internet", error: error!)
+                        loadedWeather(weatherState)
+                        
+                    } else {
+                        
+                        if let responseData = data as? NSData {
+                            var parseError: NSError?    // check if parsed data is dictionary
+                            if let parsedJsonInDictionary = NSJSONSerialization.JSONObjectWithData(responseData,
+                                options: NSJSONReadingOptions.AllowFragments,
+                                error:&parseError) as? [String: AnyObject] {
+                                    
+                                    
+                                    if let cityName = parsedJsonInDictionary["name"] as? String {
+                                        weatherState.city = cityName
                                     }
-                                }
-                                if let wind = parsedJsonInDictionary["wind"] as? [String:Float] {
-                                    weatherState.windSpeed = wind["speed"]
-                                    weatherState.windDeggree = wind["deg"]
-                                }
-                                if let main = parsedJsonInDictionary["main"] as? [String:Float] {
-                                    weatherState.temprature = main["temp"]
-                                    weatherState.pressure = main["pressure"]
-                                    weatherState.humidity = main["humidity"]
-                                }
-                                
-                                if let weather = parsedJsonInDictionary["weather"] as? [AnyObject]{
-                                    if let firstWeather = weather.first as? [String:AnyObject] {
-                                        if let description = firstWeather["description"] as? String {
-                                            weatherState.description = description
+                                    if let countrySys = parsedJsonInDictionary["sys"] as? [String:AnyObject]  {
+                                        if let country = countrySys["country"] as? String {
+                                            weatherState.counrty = country
                                         }
                                     }
-                                }
-                                if let clouds = parsedJsonInDictionary["clouds"] as? [String:Float] {
-                                    weatherState.clouds = clouds["all"]                                }
-                                if let rain = parsedJsonInDictionary["rain"] as? [String:Float]{
-                                    weatherState.rain = rain["3h"]
-                                }
-                                
-                                loadedWeather(weatherState)
+                                    if let wind = parsedJsonInDictionary["wind"] as? [String:Float] {
+                                        weatherState.windSpeed = wind["speed"]
+                                        weatherState.windDeggree = wind["deg"]
+                                    }
+                                    if let main = parsedJsonInDictionary["main"] as? [String:Float] {
+                                        weatherState.temprature = main["temp"]
+                                        weatherState.pressure = main["pressure"]
+                                        weatherState.humidity = main["humidity"]
+                                    }
+                                    
+                                    if let weather = parsedJsonInDictionary["weather"] as? [AnyObject]{
+                                        if let firstWeather = weather.first as? [String:AnyObject] {
+                                            if let description = firstWeather["description"] as? String {
+                                                weatherState.description = description
+                                            }
+                                        }
+                                    }
+                                    if let clouds = parsedJsonInDictionary["clouds"] as? [String:Float] {
+                                        weatherState.clouds = clouds["all"]                                }
+                                    if let rain = parsedJsonInDictionary["rain"] as? [String:Float]{
+                                        weatherState.rain = rain["3h"]
+                                    }
+                                    
+                                    loadedWeather(weatherState)
+                            }
                         }
                     }
             }

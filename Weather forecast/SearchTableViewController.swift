@@ -73,26 +73,32 @@ class SearchTableViewController: UITableViewController, UISearchBarDelegate {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
     }
-
+    
     // MARK: - Table view data source
-
+    
     override func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return cities.count
     }
-
+    
     
     override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCellWithIdentifier(Constants.FoundCityCellIdentifire, forIndexPath: indexPath) as! UITableViewCell
-
+        
         if let foundCityCell = cell as? FoundCityTableViewCell {
+            if cities[indexPath.row].error != nil {
+                foundCityCell.city.text = cities[indexPath.row].error!.description
+                foundCityCell.country.text = ""
+                
+            } else {
                 foundCityCell.country.text = cities[indexPath.row].counrty
                 foundCityCell.city.text = "\(cities[indexPath.row].name),"
+            }
         }
         
         return cell
     }
     
-
+    
     @IBAction func refresh(sender: UIRefreshControl) {
         openWeatherAPIManager.asynchronlySearchCityLike(named: searchBar.text,foundCities: foundedCity)
     }
@@ -100,22 +106,24 @@ class SearchTableViewController: UITableViewController, UISearchBarDelegate {
     override func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
         let foundCity = cities[indexPath.row]
         // save only if city is not in database
-        if City.MR_findFirstWithPredicate(NSPredicate(format: "name LIKE %@ AND countryCode LIKE %@", argumentArray: [foundCity.name,foundCity.counrty])) == nil {
-            var city = City.MR_createEntity() as! City
-            city.name = foundCity.name
-            city.latitude = foundCity.latitude
-            city.longitude = foundCity.longitude
-            city.countryCode = foundCity.counrty
-            
-            var saveError: NSError?    // check if parsed data is dictionary
-            NSManagedObjectContext.MR_defaultContext().MR_saveToPersistentStoreWithCompletion({ (succes, saveError) -> Void in
-                if saveError == nil {
-                    self.defaults.setBool(true, forKey: Constants.UsingSpecificPositionKey)
-                    self.defaults.setDouble(city.latitude.doubleValue, forKey: Constants.LatitudeKey)
-                    self.defaults.setDouble(city.longitude.doubleValue, forKey: Constants.LongitudeKey)
-                    self.dismissViewControllerAnimated(true, completion:nil)
-                }
-            })
+        if foundCity.error == nil {
+            if City.MR_findFirstWithPredicate(NSPredicate(format: "name LIKE %@ AND countryCode LIKE %@", argumentArray: [foundCity.name,foundCity.counrty])) == nil {
+                var city = City.MR_createEntity() as! City
+                city.name = foundCity.name
+                city.latitude = foundCity.latitude
+                city.longitude = foundCity.longitude
+                city.countryCode = foundCity.counrty
+                
+                var saveError: NSError?    // check if parsed data is dictionary
+                NSManagedObjectContext.MR_defaultContext().MR_saveToPersistentStoreWithCompletion({ (succes, saveError) -> Void in
+                    if saveError == nil {
+                        self.defaults.setBool(true, forKey: Constants.UsingSpecificPositionKey)
+                        self.defaults.setDouble(city.latitude.doubleValue, forKey: Constants.LatitudeKey)
+                        self.defaults.setDouble(city.longitude.doubleValue, forKey: Constants.LongitudeKey)
+                        self.dismissViewControllerAnimated(true, completion:nil)
+                    }
+                })
+            }
         }
     }
     

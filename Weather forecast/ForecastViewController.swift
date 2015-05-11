@@ -37,6 +37,9 @@ class ForecastViewController: UITableViewController {
     override func viewWillAppear(animated: Bool) {
         super.viewWillAppear(animated)
         
+        forecasts.forecast = nil
+        tableView.reloadData()
+        
         let useSpecificPositionForWeather = defaults.boolForKey(Constants.UsingSpecificPositionKey)
         
         if useSpecificPositionForWeather
@@ -82,7 +85,7 @@ class ForecastViewController: UITableViewController {
     // MARK: - Table view data source
     
     override func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return forecasts.forecast.count
+        return forecasts.forecast != nil ? forecasts.forecast!.count : 0
     }
     
     
@@ -90,22 +93,29 @@ class ForecastViewController: UITableViewController {
         let cell = tableView.dequeueReusableCellWithIdentifier(Constants.TempretureCelldentifire, forIndexPath: indexPath) as! UITableViewCell
         
         if let temperatureCell = cell as? TempretureTableViewCell {
-            let dayForecast = forecasts.forecast[indexPath.row]
+            let dayForecast = forecasts.forecast![indexPath.row]
             
-            // set temprature in format
-            if let tempratureTypeRawValue = defaults.stringForKey(Constants.TempratureUnitKey) {
-                temperatureCell.tempratureLabel.setTextWithAnimation(String(format:"%@°", dayForecast.tempratue.tempratureInFormatFromKelvin(SettignsTableViewController.TempratureType(rawValue: tempratureTypeRawValue)!)))
+            if dayForecast.error != nil {
+                temperatureCell.tempratureLabel.setTextWithAnimation("")
+                temperatureCell.titleLabel.text = dayNameFromToday(indexPath.row)
+                temperatureCell.weatherDescriptionLabel.setTextWithAnimation(dayForecast.error!.description)
             } else {
-                temperatureCell.tempratureLabel.setTextWithAnimation(String(format:"%@°", dayForecast.tempratue.tempratureInFormatFromKelvin(.Celsius)))
+                // set temprature in format
+                if let tempratureTypeRawValue = defaults.stringForKey(Constants.TempratureUnitKey) {
+                    temperatureCell.tempratureLabel.setTextWithAnimation(String(format:"%@°", dayForecast.tempratue.tempratureInFormatFromKelvin(SettignsTableViewController.TempratureType(rawValue: tempratureTypeRawValue)!)))
+                } else {
+                    temperatureCell.tempratureLabel.setTextWithAnimation(String(format:"%@°", dayForecast.tempratue.tempratureInFormatFromKelvin(.Celsius)))
+                }
+                
+                // set image when description contain key word
+                temperatureCell.weatherImageView.setImageWithAnimation(UIImage.weatherImage(dayForecast.description))
+                
+                temperatureCell.weatherDescriptionLabel.setTextWithAnimation(dayForecast.description.firstCharacterUpperCase())
+                
+                // dont animate is still same
+                temperatureCell.titleLabel.text = dayNameFromToday(indexPath.row)
             }
             
-            // set image when description contain key word
-            temperatureCell.weatherImageView.setImageWithAnimation(UIImage.weatherImage(dayForecast.description))
-            
-            temperatureCell.weatherDescriptionLabel.setTextWithAnimation(dayForecast.description.firstCharacterUpperCase())
-            
-            // dont animate is still same
-            temperatureCell.titleLabel.text = dayNameFromToday(indexPath.row)
         }
         
         return cell
@@ -124,7 +134,20 @@ class ForecastViewController: UITableViewController {
             self.forecasts = forecasts
             })
         } else {
-            UIAlertView(title: "Error", message: "User position is denied", delegate: nil, cancelButtonTitle: "Cancle").show()
+            var alertController = UIAlertController (title: "Error", message: "User position is denied", preferredStyle: .Alert)
+            
+            var settingsAction = UIAlertAction(title: "Open Settings", style: .Default) { (_) -> Void in
+                let settingsUrl = NSURL(string: UIApplicationOpenSettingsURLString)
+                if let url = settingsUrl {
+                    UIApplication.sharedApplication().openURL(url)
+                }
+            }
+            
+            var cancelAction = UIAlertAction(title: "Cancel", style: .Default, handler: nil)
+            alertController.addAction(settingsAction)
+            alertController.addAction(cancelAction)
+            
+            presentViewController(alertController, animated: true, completion: nil);
         }
     }
     

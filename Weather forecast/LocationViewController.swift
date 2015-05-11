@@ -63,6 +63,7 @@ class LocationViewController: UIViewController, UITableViewDataSource, UITableVi
             switch indexPath.section {
             case 0:
                 temperatureCell.currentImageView.alpha = 1.0
+                temperatureCell.titleLabel.text = "Your location"
                 
                 var (latitude,longitude) = WeatherLocationManager.sharedInstance.userPosition()
                 updateTempretureCellUI(temperatureCell, latitude: latitude!, longitude: longitude!, rowIdentifire: indexPath.row)
@@ -71,6 +72,7 @@ class LocationViewController: UIViewController, UITableViewDataSource, UITableVi
             case 1:
                 let city = cities[indexPath.row]
                 temperatureCell.currentImageView.alpha = 0.0
+                temperatureCell.titleLabel.text = city.name
                 updateTempretureCellUI(temperatureCell, latitude: city.latitude.doubleValue, longitude: city.longitude.doubleValue, rowIdentifire: indexPath.row + indexPath.section)
                 
                     
@@ -99,25 +101,30 @@ class LocationViewController: UIViewController, UITableViewDataSource, UITableVi
     private func updateTempretureCellUI(cell: TempretureTableViewCell, latitude: Double, longitude: Double,rowIdentifire: Int) {
         cell.tag = rowIdentifire
         openWeatherAPIManager.asynchronlyGetWeatherForCoordinate(longitude, latitude: latitude, loadedWeather: { (weatherState) -> () in
-            if cell.tag == rowIdentifire && weatherState.temprature != nil {
+            if cell.tag == rowIdentifire {
                 dispatch_async(dispatch_get_main_queue(), { () -> Void in
-                    cell.titleLabel.setTextWithAnimation("\(weatherState.city)")
-                    
-                    // set temprature in format
-                    if weatherState.temprature != nil {
-                    if let tempratureTypeRawValue = self.defaults.stringForKey(Constants.TempratureUnitKey) {
-                        cell.tempratureLabel.setTextWithAnimation(String(format:"%@°", weatherState.temprature!.tempratureInFormatFromKelvin(SettignsTableViewController.TempratureType(rawValue: tempratureTypeRawValue)!)))
+                    if weatherState.error != nil {
+                        cell.tempratureLabel.setTextWithAnimation("")
+                        cell.weatherDescriptionLabel.setTextWithAnimation(weatherState.error!.description)
                     } else {
-                        cell.tempratureLabel.setTextWithAnimation(String(format:"%@°", weatherState.temprature!.tempratureInFormatFromKelvin(.Celsius)))
+                        cell.titleLabel.setTextWithAnimation("\(weatherState.city)")
+                        
+                        // set temprature in format
+                        if weatherState.temprature != nil {
+                            if let tempratureTypeRawValue = self.defaults.stringForKey(Constants.TempratureUnitKey) {
+                                cell.tempratureLabel.setTextWithAnimation(String(format:"%@°", weatherState.temprature!.tempratureInFormatFromKelvin(SettignsTableViewController.TempratureType(rawValue: tempratureTypeRawValue)!)))
+                            } else {
+                                cell.tempratureLabel.setTextWithAnimation(String(format:"%@°", weatherState.temprature!.tempratureInFormatFromKelvin(.Celsius)))
+                            }
+                        } else {
+                            cell.tempratureLabel.setTextWithAnimation("-")
+                        }
+                        
+                        // set image when description contain key word
+                        cell.weatherImageView.setImageWithAnimation(UIImage.weatherImage(weatherState.description))
+                        
+                        cell.weatherDescriptionLabel.setTextWithAnimation(weatherState.description.firstCharacterUpperCase())
                     }
-                    } else {
-                        cell.tempratureLabel.setTextWithAnimation("-")
-                    }
-                    
-                    // set image when description contain key word
-                    cell.weatherImageView.setImageWithAnimation(UIImage.weatherImage(weatherState.description))
-                    
-                    cell.weatherDescriptionLabel.setTextWithAnimation(weatherState.description.firstCharacterUpperCase())
                 })
             }
         })

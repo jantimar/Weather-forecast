@@ -77,30 +77,53 @@ class TodayViewController: UIViewController {
         if longitude != nil && latitude != nil {
             openWeatherAPIManager.asynchronlyGetWeatherForCoordinate( longitude!, latitude: latitude!, loadedWeather: updateUI)
         } else {
-            UIAlertView(title: "Error", message: "User position is denied", delegate: nil, cancelButtonTitle: "Cancle").show()
+            self.descriptionLabel.setTextWithAnimation("User position is not enabled")
+            
+            var alertController = UIAlertController (title: "Error", message: "User position is denied", preferredStyle: .Alert)
+            
+            var settingsAction = UIAlertAction(title: "Open Settings", style: .Default) { (_) -> Void in
+                let settingsUrl = NSURL(string: UIApplicationOpenSettingsURLString)
+                if let url = settingsUrl {
+                    UIApplication.sharedApplication().openURL(url)
+                }
+            }
+            
+            var cancelAction = UIAlertAction(title: "Cancel", style: .Default, handler: nil)
+            alertController.addAction(settingsAction)
+            alertController.addAction(cancelAction)
+            
+            presentViewController(alertController, animated: true, completion: nil);
+            
             loadingActivityIndicator.stopAnimating()
         }
     }
     
     private func updateUI(weatherState: OpenWeatheAPIManager.WeatherState) {
         dispatch_async(dispatch_get_main_queue(), { () -> Void in
-            self.cityStateLabel.setTextWithAnimation("\(weatherState.city), \(weatherState.counrty)")
             
-            if weatherState.temprature != nil {
-                if let tempratureTypeRawValue = self.defaults.stringForKey(Constants.TempratureUnitKey) {
-                    self.descriptionLabel.setTextWithAnimation(String(format:"%@%@ | %@", weatherState.temprature!.tempratureInFormatFromKelvin(SettignsTableViewController.TempratureType(rawValue: tempratureTypeRawValue)!),SettignsTableViewController.TempratureType(rawValue: tempratureTypeRawValue)!.unitSymbol(), weatherState.description))
-                } else {
-                    self.descriptionLabel.setTextWithAnimation(String(format:"%@%@ | %@", weatherState.temprature!.tempratureInFormatFromKelvin(.Celsius),SettignsTableViewController.TempratureType.Celsius.unitSymbol(), weatherState.description))
-                }
+            if weatherState.error != nil {
+                self.cityStateLabel.text = ""
+                self.descriptionLabel.setTextWithAnimation(weatherState.error!.description)
             } else {
-                self.descriptionLabel.setTextWithAnimation(weatherState.description)
+                self.cityStateLabel.setTextWithAnimation("\(weatherState.city), \(weatherState.counrty)")
+                
+                if weatherState.temprature != nil {
+                    if let tempratureTypeRawValue = self.defaults.stringForKey(Constants.TempratureUnitKey) {
+                        self.descriptionLabel.setTextWithAnimation(String(format:"%@%@ | %@", weatherState.temprature!.tempratureInFormatFromKelvin(SettignsTableViewController.TempratureType(rawValue: tempratureTypeRawValue)!),SettignsTableViewController.TempratureType(rawValue: tempratureTypeRawValue)!.unitSymbol(), weatherState.description))
+                    } else {
+                        self.descriptionLabel.setTextWithAnimation(String(format:"%@%@ | %@", weatherState.temprature!.tempratureInFormatFromKelvin(.Celsius),SettignsTableViewController.TempratureType.Celsius.unitSymbol(), weatherState.description))
+                    }
+                } else {
+                    self.descriptionLabel.setTextWithAnimation(weatherState.description)
+                }
+                
+                self.weatherIconImageView.setImageWithAnimation(UIImage.weatherImage(weatherState.description))
+                
+                self.weatherStateView.updateWeathes(weatherState)
             }
             
-            self.weatherIconImageView.setImageWithAnimation(UIImage.weatherImage(weatherState.description))
-            
-            self.weatherStateView.updateWeathes(weatherState)
-            
             self.loadingActivityIndicator?.stopAnimating()
+            
         })
     }
     
