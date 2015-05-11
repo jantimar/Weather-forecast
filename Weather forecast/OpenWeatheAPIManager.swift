@@ -7,10 +7,27 @@
 //
 
 import UIKit
+import MapKit
 
 import Alamofire
 
 class OpenWeatheAPIManager: NSObject {
+    
+    class FoundCityAnnotaion: NSObject,MKAnnotation {
+        let title: String
+        let coordinate: CLLocationCoordinate2D
+        let subtitle: String
+        let country: String
+        
+        init(title: String, subtitle: String,country: String, longitude: Double, latitude: Double) {
+            self.title = title
+            self.subtitle = subtitle
+            self.coordinate = CLLocationCoordinate2DMake(latitude, longitude)
+            self.country = country
+            super.init()
+        }
+        
+    }
     
     struct WeatherAPIEror {
         var description: String
@@ -268,5 +285,55 @@ class OpenWeatheAPIManager: NSObject {
             }
         }
     }
+    
+    func asynchronlyFoundNearstCitiesForCoordinate(longitude: Double,latitude: Double,count: Int,foundCities: (latitude: Double,longitude: Double, [FoundCityAnnotaion]) -> ()) {
+        UIApplication.sharedApplication().networkActivityIndicatorVisible = true
+        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0)) {
+            //api.openweathermap.org/data/2.5/find?lat=55.5&lon=37.5&cnt=5
+            Alamofire.request(.GET, "http://api.openweathermap.org/data/2.5/find", parameters: ["lat": latitude, "lon": longitude, "cnt": count])
+                .response { (request, response, data, error) in
+                    
+                    UIApplication.sharedApplication().networkActivityIndicatorVisible = false
+                    
+                    if let responseData = data as? NSData {
+                        var parseError: NSError?    // check if parsed data is dictionary
+                        if let parsedJsonInDictionary = NSJSONSerialization.JSONObjectWithData(responseData,
+                            options: NSJSONReadingOptions.AllowFragments,
+                            error:&parseError) as? [String: AnyObject] {
+                                
+                                var foundedCities = [FoundCityAnnotaion]()
+                                
+                                if let cities = parsedJsonInDictionary["list"] as? [AnyObject] {
+                                    for city in cities {
+                                        if let cityName = city["name"] as? String {
+                                            if let coordination = city["coord"] as? [String:Double] {
+                                                if let latitude = coordination["lat"] {
+                                                    if let longitude = coordination["lon"] {
+                                                        
+                                                        if let weather = city["weather"] as? [AnyObject]{
+                                                            if let firstWeather = weather.first as? [String:AnyObject] {
+                                                                if let description = firstWeather["description"] as? String {
+                                                                    if let sys = city["sys"] as? [String:String] {
+                                                                        if let country = sys["country"] {
+                                                                            foundedCities.append(FoundCityAnnotaion(title: cityName,subtitle: description, country: country,longitude: longitude, latitude: latitude))
+                                                                        }
+                                                                    }
+                                                                }
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                                foundCities(latitude: latitude, longitude: longitude, foundedCities)
+                        }
+                    }
+            }
+        }
+        
+    }
+    
 }
 

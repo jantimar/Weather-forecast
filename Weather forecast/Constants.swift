@@ -13,6 +13,7 @@ struct Constants {
     static let LengthUnitKey = "sk.jantimar.Weather-forecast.LengthUnitKey"
     static let TempretureCelldentifire = "TempretureTableViewCelldentifire"
     static let FoundCityCellIdentifire = "FoundCityCellIdentifire"
+    static let FoundCityMapAnnotationIdentifire = "FoundCityMapAnnotationIdentifire"
     static let UsingSpecificPositionKey = "sk.jantimar.Weather-forecast.UsingSpecificPositionKey"
     static let LatitudeKey = "sk.jantimar.Weather-forecast.LatitudenKey"
     static let LongitudeKey = "sk.jantimar.Weather-forecast.LongitudeKey"

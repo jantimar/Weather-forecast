@@ -634,6 +634,79 @@
             </objects>
             <point key="canvasLocation" x="2363" y="-242"/>
         </scene>
+        <!--Weather on map-->
+        <scene sceneID="DE1-qA-pw0">
+            <objects>
+                <viewController id="xRf-HH-3lK" customClass="SearchOnMapViewController" customModule="Weather_forecast" customModuleProvider="target" sceneMemberID="viewController">
+                    <layoutGuides>
+                        <viewControllerLayoutGuide type="top" id="CWr-qF-wvP"/>
+                        <viewControllerLayoutGuide type="bottom" id="GRo-Oe-hfe"/>
+                    </layoutGuides>
+                    <view key="view" contentMode="scaleToFill" id="prK-85-mQZ">
+                        <rect key="frame" x="0.0" y="0.0" width="600" height="536"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <mapView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" mapType="standard" translatesAutoresizingMaskIntoConstraints="NO" id="3fk-6x-nX2">
+                                <rect key="frame" x="0.0" y="0.0" width="600" height="536"/>
+                                <connections>
+                                    <outlet property="delegate" destination="xRf-HH-3lK" id="V86-VF-KEy"/>
+                                </connections>
+                            </mapView>
+                            <slider opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" value="8" minValue="1" maxValue="15" translatesAutoresizingMaskIntoConstraints="NO" id="5Fq-Zx-TMI">
+                                <rect key="frame" x="14" y="8" width="572" height="31"/>
+                                <connections>
+                                    <action selector="sliderDidChangeValue:" destination="xRf-HH-3lK" eventType="touchUpInside" id="CYD-YL-Reb"/>
+                                    <action selector="sliderDidChangeValue:" destination="xRf-HH-3lK" eventType="touchUpOutside" id="eMK-FL-Jvu"/>
+                                </connections>
+                            </slider>
+                            <segmentedControl opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="top" segmentControlStyle="plain" selectedSegmentIndex="0" translatesAutoresizingMaskIntoConstraints="NO" id="bvn-ox-tJW">
+                                <rect key="frame" x="16" y="488" width="568" height="29"/>
+                                <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                <segments>
+                                    <segment title="Standard"/>
+                                    <segment title="Satelite"/>
+                                    <segment title="Hybrid"/>
+                                </segments>
+                                <userDefinedRuntimeAttributes>
+                                    <userDefinedRuntimeAttribute type="number" keyPath="layer.cornerRadius">
+                                        <integer key="value" value="5"/>
+                                    </userDefinedRuntimeAttribute>
+                                </userDefinedRuntimeAttributes>
+                                <connections>
+                                    <action selector="segmentControlValueDidChange:" destination="xRf-HH-3lK" eventType="valueChanged" id="Wfr-Y8-d9N"/>
+                                </connections>
+                            </segmentedControl>
+                        </subviews>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                        <constraints>
+                            <constraint firstAttribute="trailing" secondItem="3fk-6x-nX2" secondAttribute="trailing" id="1K7-PW-ytv"/>
+                            <constraint firstItem="5Fq-Zx-TMI" firstAttribute="trailing" secondItem="prK-85-mQZ" secondAttribute="trailingMargin" id="21q-qb-KYM"/>
+                            <constraint firstItem="3fk-6x-nX2" firstAttribute="top" secondItem="CWr-qF-wvP" secondAttribute="bottom" id="2If-GP-Le7"/>
+                            <constraint firstItem="GRo-Oe-hfe" firstAttribute="top" secondItem="3fk-6x-nX2" secondAttribute="bottom" id="QPi-ni-MDj"/>
+                            <constraint firstItem="3fk-6x-nX2" firstAttribute="leading" secondItem="prK-85-mQZ" secondAttribute="leading" id="Ss5-7M-wY1"/>
+                            <constraint firstItem="5Fq-Zx-TMI" firstAttribute="top" secondItem="CWr-qF-wvP" secondAttribute="bottom" constant="8" id="T0Z-XB-CxB"/>
+                            <constraint firstItem="GRo-Oe-hfe" firstAttribute="top" secondItem="bvn-ox-tJW" secondAttribute="bottom" constant="20" id="Vod-aF-s4O"/>
+                            <constraint firstItem="bvn-ox-tJW" firstAttribute="trailing" secondItem="prK-85-mQZ" secondAttribute="trailingMargin" id="WeF-LK-Ivl"/>
+                            <constraint firstItem="bvn-ox-tJW" firstAttribute="leading" secondItem="prK-85-mQZ" secondAttribute="leadingMargin" id="ob9-Vz-Edi"/>
+                            <constraint firstItem="5Fq-Zx-TMI" firstAttribute="leading" secondItem="prK-85-mQZ" secondAttribute="leadingMargin" id="tcx-Pb-MAw"/>
+                        </constraints>
+                    </view>
+                    <navigationItem key="navigationItem" title="Weather on map" id="NSi-cY-WiR">
+                        <barButtonItem key="rightBarButtonItem" title="Close" id="Ufs-Xl-pAI">
+                            <connections>
+                                <action selector="closeButtonPress:" destination="xRf-HH-3lK" id="lOf-aP-dDC"/>
+                            </connections>
+                        </barButtonItem>
+                    </navigationItem>
+                    <connections>
+                        <outlet property="cityCoundSlider" destination="5Fq-Zx-TMI" id="SQa-Fj-dzi"/>
+                        <outlet property="mapView" destination="3fk-6x-nX2" id="im2-h7-MkL"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="6rz-qg-MyH" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="3770" y="-236"/>
+        </scene>
         <!--Search Table View Controller-->
         <scene sceneID="gVf-so-8Ba">
             <objects>
@@ -686,6 +759,12 @@
                         </connections>
                     </tableView>
                     <navigationItem key="navigationItem" id="iML-HW-DEj">
+                        <barButtonItem key="leftBarButtonItem" title="MAP" id="2Iq-gV-Tza">
+                            <color key="tintColor" red="0.1843137255" green="0.56862745100000001" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                            <connections>
+                                <segue destination="xRf-HH-3lK" kind="push" id="aGm-Ke-LzE"/>
+                            </connections>
+                        </barButtonItem>
                         <barButtonItem key="rightBarButtonItem" title="Close" id="HBq-vH-nDe">
                             <connections>
                                 <action selector="closeButtonPress:" destination="Ian-Gc-urQ" id="dQ9-HS-kYc"/>
@@ -704,7 +783,7 @@
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="BNW-NA-ZE5" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="3062" y="-242"/>
+            <point key="canvasLocation" x="3052" y="-236"/>
         </scene>
         <!--Today-->
         <scene sceneID="Leh-Fa-HPx">
